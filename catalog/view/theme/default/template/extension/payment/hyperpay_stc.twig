@@ -1,0 +1,55 @@
+<style>
+form {
+    display:block;
+}
+</style>
+
+<script>
+    var wpwlOptions = {
+    style: "{{ formStyle }}",
+	paymentTarget: "_top",
+	locale: "{{ language_code }}",
+	onReady: function(){
+        
+    $('.wpwl-form-virtualAccount-STC_PAY .wpwl-wrapper-radio-qrcode').hide();
+    $('.wpwl-form-virtualAccount-STC_PAY .wpwl-wrapper-radio-mobile').hide();
+    $('.wpwl-form-virtualAccount-STC_PAY .wpwl-group-paymentMode').hide();
+    $('.wpwl-form-virtualAccount-STC_PAY .wpwl-group-mobilePhone').show();
+    $('.wpwl-form-virtualAccount-STC_PAY .wpwl-wrapper-radio-mobile .wpwl-control-radio-mobile').attr('checked',true);
+    $('.wpwl-form-virtualAccount-STC_PAY .wpwl-wrapper-radio-mobile .wpwl-control-radio-mobile').trigger('click');
+    
+    },
+    
+    };
+
+
+</script>
+{% if language_code == 'ar' %}
+<style>
+.wpwl-group{
+	direction:ltr !important;
+}
+.wpwl-control-cardNumber{
+direction:ltr !important;
+text-align:right;
+}
+</style>
+{% endif %}
+
+<script>
+$.ajaxSetup({
+    // Disable caching of AJAX responses
+    cache: true
+});
+</script>
+
+<script src="{{ scriptURL }}"></script>
+
+<div>
+    <form action="{{ postbackURL }}" class="paymentWidgets">
+      {{ payment_brands }}
+    </form>    
+</div>
+<div class="buttons" style="display:none;">
+  <div class="right"><a id="button-confirm" class="button" onclick="$('#payment').submit();"><span>{{ button_confirm }}</span></a></div>
+</div>
