@@ -64,6 +64,11 @@ $_['text_missing']                            = 'Missing Orders';
 
 $_['entry_status'] = 'Status';
 
+$_['tokenization_status'] = 'Tokenization Status';
+$_['tokenization_status_off'] = 'Disable';
+$_['tokenization_status_on'] = 'Enable';
+
+
 /*$_['entry_sort_order'] = 'Sort Order';
 
 $_['entry_order_identifier'] = 'Order Identifer<span class="help">This defines what should be shown in the subject field of the transaction</span>';
@@ -76,4 +81,3 @@ $_['entry_order_identifier_id_disabled'] = 'Disabled';
 // Error
 $_['error_encyptionkey'] = 'EncryptionKey Required!';
  */
-?>

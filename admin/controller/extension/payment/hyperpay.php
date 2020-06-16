@@ -4,6 +4,20 @@ class ControllerExtensionPaymentHyperpay extends Controller
 {
     private $error = array();
 
+    public function install()
+    {
+        $sql = "CREATE TABLE IF NOT EXISTS " . DB_PREFIX . "hp_saving_cards (
+        id INT AUTO_INCREMENT,
+         registration_id VARCHAR(255) NOT NULL,
+         customer_id VARCHAR(255) NOT NULL,
+         mode int (10) NOT NULL,
+         PRIMARY KEY (id)
+     )  ENGINE=INNODB;";
+
+        $this->db->query($sql);
+    }
+
+
 
     public function index()
     {
@@ -117,6 +131,11 @@ class ControllerExtensionPaymentHyperpay extends Controller
         $data['entry_order_status'] = $this->language->get('entry_order_status');
         $data['entry_order_status_failed'] = $this->language->get('entry_order_status_failed');
         $data['entry_all_connector'] = $this->get_hyperpay_connector();
+
+        $data['tokenization_status'] = $this->language->get('tokenization_status');
+
+        $data['tokenization_status_off'] = $this->language->get('tokenization_status_off');
+        $data['tokenization_status_on'] = $this->language->get('tokenization_status_on');
         //-----------------------------------------------------------------------
 
         if (isset($this->request->post['payment_hyperpay_status'])) {
@@ -215,6 +234,12 @@ class ControllerExtensionPaymentHyperpay extends Controller
             $data['payment_hyperpay_order_status_failed_id'] = $this->request->post['payment_hyperpay_order_status_failed_id'];
         } else {
             $data['payment_hyperpay_order_status_failed_id'] = $this->config->get('payment_hyperpay_order_status_failed_id');
+        }
+
+        if (isset($this->request->post['payment_hyperpay_tokenization_status'])) {
+            $data['payment_hyperpay_tokenization_status'] = $this->request->post['payment_hyperpay_tokenization_status'];
+        } else {
+            $data['payment_hyperpay_tokenization_status'] = $this->config->get('payment_hyperpay_tokenization_status');
         }
 
 
