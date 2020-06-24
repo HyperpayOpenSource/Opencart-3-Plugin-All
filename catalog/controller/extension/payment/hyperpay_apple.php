@@ -110,6 +110,7 @@ class ControllerExtensionPaymentHyperpayApple extends Controller
         //--------------------------------------
         $data['token'] = $token;
         $data['payment_brands'] = $payment_brands;
+        $data['supportedNetworks'] = json_encode($this->config->get('payment_hyperpay_apple_supported_networks'));
         $data['scriptURL'] = $scriptURL . $token;
 
         $data['formStyle'] = $this->config->get('payment_hyperpay_apple_payment_style');

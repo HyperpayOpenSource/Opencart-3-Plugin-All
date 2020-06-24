@@ -63,6 +63,7 @@ $_['entry_order_status_processing'] = 'Order Status Processing';
 $_['text_missing']                            = 'Missing Orders';
 
 $_['entry_status'] = 'Status';
+$_['entry_supported_networks'] = "Supported Networks";
 
 /*$_['entry_sort_order'] = 'Sort Order';
 
@@ -76,4 +77,3 @@ $_['entry_order_identifier_id_disabled'] = 'Disabled';
 // Error
 $_['error_encyptionkey'] = 'EncryptionKey Required!';
  */
-?>

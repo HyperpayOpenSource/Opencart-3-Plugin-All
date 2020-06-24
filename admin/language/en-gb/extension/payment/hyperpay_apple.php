@@ -64,6 +64,8 @@ $_['text_missing']                            = 'Missing Orders';
 
 $_['entry_status'] = 'Status';
 
+$_['entry_supported_networks'] = "Supported Networks";
+
 /*$_['entry_sort_order'] = 'Sort Order';
 
 $_['entry_order_identifier'] = 'Order Identifer<span class="help">This defines what should be shown in the subject field of the transaction</span>';
@@ -76,4 +78,3 @@ $_['entry_order_identifier_id_disabled'] = 'Disabled';
 // Error
 $_['error_encyptionkey'] = 'EncryptionKey Required!';
  */
-?>
