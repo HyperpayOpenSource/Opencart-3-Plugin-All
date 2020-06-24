@@ -1,8 +1,10 @@
 <?php
 
-class ControllerExtensionPaymentHyperpayApple extends Controller {
+class ControllerExtensionPaymentHyperpayApple extends Controller
+{
 
-    public function index() {
+    public function index()
+    {
         $this->language->load('extension/payment/hyperpay');
         $this->load->model('checkout/order');
         $data['button_confirm'] = $this->language->get('button_confirm');
@@ -43,8 +45,8 @@ class ControllerExtensionPaymentHyperpayApple extends Controller {
         if (empty($state)) {
             $state = $city;
         }
-$lang=explode('-',$this->session->data['language']);
-       $datacontent = "entityId=$channel" .
+        $lang = explode('-', $this->session->data['language']);
+        $datacontent = "entityId=$channel" .
             "&amount=$amount" .
             "&currency=$currency" .
             "&paymentType=$type" .
@@ -78,12 +80,13 @@ $lang=explode('-',$this->session->data['language']);
         }
 
         if ($mode == 'CONNECTOR_TEST') {
-            $datacontent .="&testMode=EXTERNAL";
+            $datacontent .= "&testMode=EXTERNAL";
         }
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                   'Authorization:Bearer '.$token));
+            'Authorization:Bearer ' . $token
+        ));
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $datacontent);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -110,7 +113,7 @@ $lang=explode('-',$this->session->data['language']);
         $data['scriptURL'] = $scriptURL . $token;
 
         $data['formStyle'] = $this->config->get('payment_hyperpay_apple_payment_style');
-		$data['language_code'] = $this->session->data['language'];
+        $data['language_code'] = $this->session->data['language'];
 
         $http = explode(':', $this->url->link('checkout/success'));
         $url = HTTP_SERVER;
@@ -118,12 +121,12 @@ $lang=explode('-',$this->session->data['language']);
             $url = HTTPS_SERVER;
         }
         $data['postbackURL'] = $url . 'index.php?route=extension/payment/hyperpay_apple/callback';
-            
+
         return $this->load->view('extension/payment/hyperpay_apple', $data);
-        
     }
 
-    public function callback() {
+    public function callback()
+    {
         if (isset($_GET['id'])) {
             $this->load->model('checkout/order');
 
@@ -137,13 +140,14 @@ $lang=explode('-',$this->session->data['language']);
                 $url = "https://test.oppwa.com/v1/checkouts/$token/payment";
             }
             $url .= "?entityId=" . trim($this->config->get('payment_hyperpay_apple_channel'));
-            $accesstoken=$this->config->get('payment_hyperpay_apple_accesstoken');
+            $accesstoken = $this->config->get('payment_hyperpay_apple_accesstoken');
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                   'Authorization:Bearer '.$accesstoken));
+                'Authorization:Bearer ' . $accesstoken
+            ));
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-         
+
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             $responseData = curl_exec($ch);
@@ -158,21 +162,20 @@ $lang=explode('-',$this->session->data['language']);
             $orderid = '';
 
             switch ($resultJson->result->code) {
-                case (preg_match('/^(000\.000\.|000\.100\.1|000\.[36])/', $resultJson->result->code) ? true : false) :
-                case (preg_match('/^(000\.400\.0|000\.400\.100)/', $resultJson->result->code) ? true : false) :
+                case (preg_match('/^(000\.000\.|000\.100\.1|000\.[36])/', $resultJson->result->code) ? true : false):
+                case (preg_match('/^(000\.400\.0|000\.400\.100)/', $resultJson->result->code) ? true : false):
                     $success = 1;
                     break;
-                default :
-                  if($resultJson->paymentBrand == 'SADAD'){
-        if(isset($resultJson->resultDetails->ErrorMessage)){
-                                $failed_msg = $resultJson->resultDetails->Error;
-                        }else{
-                                $failed_msg = $resultJson->result->description;
+                default:
+                    if ($resultJson->paymentBrand == 'SADAD') {
+                        if (isset($resultJson->resultDetails->ErrorMessage)) {
+                            $failed_msg = $resultJson->resultDetails->Error;
+                        } else {
+                            $failed_msg = $resultJson->result->description;
                         }
-                }else{
-                    $failed_msg = $resultJson->result->description;
-
-                        }
+                    } else {
+                        $failed_msg = $resultJson->result->description;
+                    }
             }
             $orderid = $resultJson->merchantTransactionId;
 
@@ -216,7 +219,8 @@ $lang=explode('-',$this->session->data['language']);
         exit;
     }
 
-    public function sendEmail($toEmail, $subject, $message) {
+    public function sendEmail($toEmail, $subject, $message)
+    {
         $this->load->model('setting/store');
 
         $store_name = $this->config->get('config_name');
@@ -237,7 +241,8 @@ $lang=explode('-',$this->session->data['language']);
         $mail->send();
     }
 
-    protected function success() {
+    protected function success()
+    {
         $this->response->redirect($this->url->link('checkout/success', '', true));
         exit;
     }
@@ -247,15 +252,15 @@ $lang=explode('-',$this->session->data['language']);
         return preg_match("/^[\w\s\.\-\,]*$/", $text);
     }
 
-    public function fail() {
+    public function fail()
+    {
         $this->language->load('extension/payment/hyperpay');
         $data['heading_title'] = $this->config->get('payment_hyperpay_apple_heading_title');
 
         if (isset($this->session->data['payment_hyperpay_apple_error'])) {
             $data['general_error'] = $this->session->data['payment_hyperpay_apple_error'];
         } else {
-            $data['general_error'] = $this->language->get('general_error');
-            ;
+            $data['general_error'] = $this->language->get('general_error');;
         }
         $data['button_back'] = $this->language->get('button_back');
         $data['back'] = $this->url->link('common/home');
@@ -268,10 +273,6 @@ $lang=explode('-',$this->session->data['language']);
         $data['footer'] = $this->load->controller('common/footer');
         $data['header'] = $this->load->controller('common/header');
 
-            $this->response->setOutput($this->load->view('extension/payment/hyperpay_fail', $data));
-        
+        $this->response->setOutput($this->load->view('extension/payment/hyperpay_fail', $data));
     }
-
 }
-
-?>
