@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+	<name>Hyperpay Mod - Add icon to payment_method</name>
+	<version>3.x</version>
+	<code>Hyperpay Mod</code>
+	<author>Hyperpay(https://www.hyperpay.com)</author>
+	<link>https://www.hyperpay.com/</link>
+
+
+   <file path="catalog/view/theme/*/template/checkout/payment_method.twig">
+		<operation error="log">
+			<search><![CDATA[{{ payment_method.title }}]]></search>
+			<add position="after"><![CDATA[
+				{% if payment_method.icon %}
+                <img width="60" height="30" src="{{ payment_method.icon }}" />
+                {% endif %}
+				]]></add>
+		</operation>
+	</file>
+
+ <file path="system/library/template/twig.php" error="skip" info="fix Core Opencart twig files modification">
+	 <operation>
+		 <search><![CDATA[$file = DIR_TEMPLATE . $filename . '.twig';]]></search>
+		 <add position="replace"><![CDATA[$file = modification( DIR_TEMPLATE . $filename . '.twig' );
+		 if( class_exists('VQMod') ) {
+			 $file = \VQMod::modCheck($file);
+		 }
+		 ]]></add>
+	 </operation>
+ </file>
+
+</modification>
