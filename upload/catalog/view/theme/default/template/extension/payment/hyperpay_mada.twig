@@ -7,8 +7,8 @@
         display: block;
         visibility: visible;
         position: absolute;
-        right: 8px;
-        top: 7px;
+        right: -8px;
+        top: 5px;
         width: 65px;
         z-index: 10;
         float: right;
@@ -16,6 +16,13 @@
 
     .wpwl-brand-MASTER {
         top: 0px;
+    }
+
+    .wpwl-label-brand{
+      display: none !important;
+    }
+    .wpwl-control-brand{
+      display: none !important;
     }
 </style>
 
@@ -64,6 +71,11 @@
             direction: ltr !important;
             text-align: right;
         }
+
+        .wpwl-brand-card {
+            left: 8px !important;
+            right: unset  !important;
+        }
     </style>
 {% endif %}
 
@@ -77,12 +89,11 @@
 <script src="{{ scriptURL }}"></script>
 
 <div>
-    <form action="{{ postbackURL }}" class="paymentWidgets">
-        {{ payment_brands }}
+    <form action="{{ postbackURL }}" class="paymentWidgets" data-brands="{{ payment_brands }}">
+
     </form>
 </div>
 <div class="buttons" style="display:none;">
     <div class="right"><a id="button-confirm" class="button"
                           onclick="$('#payment').submit();"><span>{{ button_confirm }}</span></a></div>
 </div>
-

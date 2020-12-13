@@ -38,9 +38,9 @@ $.ajaxSetup({
 <script src="{{ scriptURL }}"></script>
 
 <div>
-    <form action="{{ postbackURL }}" class="paymentWidgets">
-      {{ payment_brands }}
-    </form>    
+    <form action="{{ postbackURL }}" class="paymentWidgets"  data-brands="{{ payment_brands }}">
+
+    </form>
 </div>
 <div class="buttons" style="display:none;">
   <div class="right"><a id="button-confirm" class="button" onclick="$('#payment').submit();"><span>{{ button_confirm }}</span></a></div>

@@ -25,9 +25,9 @@ form {
             '</div><div class="customInput style ="' + style + '""><input type="checkbox" name="createRegistration" value="true" /></div>';
         $('form.wpwl-form-card').find('.wpwl-button').before(createRegistrationHtml);
 {% endif %}
-    
+
     },
-    
+
     };
 
 
@@ -54,9 +54,9 @@ $.ajaxSetup({
 <script src="{{ scriptURL }}"></script>
 
 <div>
-    <form action="{{ postbackURL }}" class="paymentWidgets">
-      {{ payment_brands }}
-    </form>    
+    <form action="{{ postbackURL }}" class="paymentWidgets"  data-brands="{{ payment_brands }}">
+
+    </form>
 </div>
 <div class="buttons" style="display:none;">
   <div class="right"><a id="button-confirm" class="button" onclick="$('#payment').submit();"><span>{{ button_confirm }}</span></a></div>
