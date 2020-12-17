@@ -27,12 +27,12 @@
                     <div class="form-group required">
                         <label class="col-sm-2 control-label" for="input-heading-title">{{ entry_heading_title }}</label>
                         <div class="col-sm-10">
-                            <input type="text" name="payment_hyperpay_mada_heading_title" value="{{ payment_hyperpay_mada_heading_title }}" placeholder="{{ entry_heading_title }}" id="input-heading-title" class="form-control" />
+                            <input readonly type="text" name="payment_hyperpay_mada_heading_title" value="{{ payment_hyperpay_mada_heading_title }}" placeholder="{{ entry_heading_title }}" id="input-heading-title" class="form-control" />
                             {% if error_heading_title %}
                                 <div class="text-danger">{{ error_heading_title }}</div>
                             {% endif %}
                         </div>
-                    </div>  
+                    </div>
                     <div class="form-group required">
                         <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
                         <div class="col-sm-10">
@@ -41,7 +41,7 @@
                                 <option value="1" {{ (payment_hyperpay_mada_status == '1')?'selected="selected"':'' }}>{{ text_enabled }}</option>
                             </select>
                         </div>
-                    </div> 
+                    </div>
                      <div class="form-group required">
                         <label class="col-sm-2 control-label" for="input-type">{{ entry_connector }}</label>
                         <div class="col-sm-10">
@@ -51,10 +51,10 @@
                                 {% endfor %}
                             </select>
                         </div>
-                    </div>      
-                    
-                   
-                      
+                    </div>
+
+
+
                     <div class="form-group required">
                         <label class="col-sm-2 control-label" for="input-testmode">{{ entry_testmode }} </label>
                         <div class="col-sm-10">
@@ -63,7 +63,7 @@
                                 <option value="1" {{ (payment_hyperpay_mada_testmode == '1')?'selected="selected"':'' }}>{{ entry_testmode_on }}</option>
                             </select>
                         </div>
-                    </div>              
+                    </div>
                     <div class="form-group required">
                         <label class="col-sm-2 control-label" for="input-type">{{ entry_base_currency }}</label>
                         <div class="col-sm-10">
@@ -73,7 +73,7 @@
                                 {% endfor %}
                             </select>
                         </div>
-                    </div>   
+                    </div>
                     <div class="form-group required">
                                 <label class="col-sm-2 control-label" for="input-type"> {{ entry_trans_type }}</label>
                                 <div class="col-sm-10">
@@ -83,7 +83,7 @@
                                         {% endfor %}
                                     </select>
                                 </div>
-                    </div>             
+                    </div>
                     <div class="form-group required">
                         <label class="col-sm-2 control-label" for="input-mode">{{ entry_trans_mode }}</label>
                         <div class="col-sm-10">
@@ -94,34 +94,34 @@
                                 {% endfor %}
                             </select>
                         </div>
-                    </div>                
+                    </div>
                     <div class="form-group required">
                         <label class="col-sm-2 control-label" for="input-channel">{{ entry_channel }}</label>
                         <div class="col-sm-10">
                             <input type="text" name="payment_hyperpay_mada_channel" value="{{ payment_hyperpay_mada_channel }}" placeholder="{{ entry_channel }}" id="input-channel" class="form-control" />
-                            
+
                             {% if error_channel %}
                             <div class="text-danger">{{ error_channel }}</div>
-                            {% endif %}                    
+                            {% endif %}
                         </div>
-                    </div>  
-              
+                    </div>
+
                      <div class="form-group required">
                         <label class="col-sm-2 control-label" for="input-accesstoken">{{ entry_accesstoken }}</label>
                         <div class="col-sm-10">
                             <input type="text" name="payment_hyperpay_mada_accesstoken" value="{{ payment_hyperpay_mada_accesstoken }}" placeholder="{{ entry_accesstoken }}" id="input-loginid" class="form-control" />
-                            
+
                             {% if error_accesstoken %}
                             <div class="text-danger">{{ error_accesstoken }}</div>
-                            {% endif %}                    
+                            {% endif %}
                         </div>
-                    </div>  
-            
+                    </div>
+
                     <div class="form-group required">
                         <label class="col-sm-2 control-label" for="input-brands">{{ entry_brands }}</label>
                         <div class="col-sm-10">
                             {% set i = 1 %}
-                            {% for payment, name in entry_all_brands %}                
+                            {% for payment, name in entry_all_brands %}
 
                             <label class="checkbox-inline">
                                 {#<input type="checkbox" name="payment_hyperpay_mada_brands[]" value="{{ payment }}" {{ (is iterable(payment_hyperpay_mada_brands) and in_array(payment,payment_hyperpay_mada_brands))?'checked="checked"':'' }}/> {{ name }} #}
@@ -131,9 +131,9 @@
                                 {% else %}
                                         <input type="checkbox" name="payment_hyperpay_mada_brands[]" value="{{ payment }}" />{{ name }}
                                 {% endif %}
-                                    
+
                             </label>
-                            
+
                             {% if i%2 ==0 %}
                             {{ '</tr><tr>' }}
                             {% endif %}
@@ -149,54 +149,54 @@
                                 <option value="1" {{ (payment_hyperpay_mada_tokenization_status == '1')?'selected="selected"':'' }}>{{ tokenization_status_on }}</option>
                             </select>
                         </div>
-                    </div>               
+                    </div>
                     <div class="form-group required">
                         <label class="col-sm-2 control-label" for="input-style">{{ entry_payment_style }}</label>
-                        <div class="col-sm-10">                
+                        <div class="col-sm-10">
                             <select name="payment_hyperpay_mada_payment_style" class="form-control">
-                                {% for payment_style_val, payment_style in entry_all_payment_style %} 
+                                {% for payment_style_val, payment_style in entry_all_payment_style %}
                                 <option value="{{ payment_style_val }}" {{ (payment_hyperpay_mada_payment_style == payment_style_val)?'selected="selected"':'' }}>{{ payment_style }}</option>
                                 {% endfor %}
-                            </select>                
+                            </select>
                         </div>
-                    </div>             
+                    </div>
                     <div class="form-group required">
                         <label class="col-sm-2 control-label" for="input-status">{{ entry_order_status }}</label>
-                        <div class="col-sm-10">                
+                        <div class="col-sm-10">
                             <select name="payment_hyperpay_mada_order_status_id" class="form-control">
                                 {% for order_status in order_statuses %}
                                 <option value="{{ order_status.order_status_id }}" {{ (order_status.order_status_id == payment_hyperpay_mada_order_status_id)?'selected="selected"':'' }}>{{ order_status.name }}</option>
                                 {% endfor %}
-                            </select>               
+                            </select>
                         </div>
-                    </div>            
+                    </div>
                     <div class="form-group required">
                         <label class="col-sm-2 control-label" for="input-failed">{{ entry_order_status_failed }}</label>
-                        <div class="col-sm-10">                
+                        <div class="col-sm-10">
                             <select name="payment_hyperpay_mada_order_status_failed_id" class="form-control">
                                 <option value="0" {{ ('0' == payment_hyperpay_mada_order_status_failed_id)?'selected="selected"':'' }}>{{ text_missing }}</option>
                                 {% for order_status in order_statuses %}
                                 <option value="{{ order_status.order_status_id }}" {{ (order_status.order_status_id == payment_hyperpay_mada_order_status_failed_id)?'selected="selected"':'' }}>{{ order_status.name }}</option>
                                 {% endfor %}
-                            </select>              
+                            </select>
                         </div>
-                    </div>                
+                    </div>
                     <div class="form-group required">
                         <label class="col-sm-2 control-label" for="input-mailerrors">{{ entry_mailerrors }}</label>
-                        <div class="col-sm-10">          
+                        <div class="col-sm-10">
                             <div class="checkbox">
                                 <label>
                                     <input type="checkbox" name="payment_hyperpay_mada_mailerrors" value="1" {{ (payment_hyperpay_mada_mailerrors == '1')?'checked="checked"':'' }} /> {{ entry_mailerrors_enable }}
                                 </label>
                             </div>
                         </div>
-                    </div>   
+                    </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label" for="input-sort-order">{{ entry_sort_order }}</label>
                         <div class="col-sm-10">
                             <input type="text" name="payment_hyperpay_mada_sort_order" value="{{ payment_hyperpay_mada_sort_order }}" placeholder="{{ entry_sort_order }}" id="input-sort-order" class="form-control" />
                         </div>
-                    </div>            
+                    </div>
                 </form>
             </div>
         </div>
