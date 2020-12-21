@@ -248,7 +248,7 @@ class ControllerExtensionPaymentHyperpayMada extends Controller
         if($this->config->get('config_language') == 'ar'){
           $data['payment_hyperpay_mada_heading_title'] = 'بطاقة مدى البنكية';
         }else{
-          $data['payment_hyperpay_mada_heading_title'] = 'mada card';
+          $data['payment_hyperpay_mada_heading_title'] = 'mada debit card';
         }
 
         $data['header'] = $this->load->controller('common/header');
