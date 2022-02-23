@@ -1,0 +1,141 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="submit" form="form-payment" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+        <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+        </div>
+    {% endif %}
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+          </div>
+            <div class="panel-body">
+                <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-authorizenet-aim" class="form-horizontal">
+                    <div class="form-group required">
+                        <label class="col-sm-2 control-label" for="input-heading-title">{{ entry_heading_title }}</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="payment_hyperpay_tabby_heading_title" value="{{ payment_hyperpay_tabby_heading_title }}" placeholder="{{ entry_heading_title }}" id="input-heading-title" class="form-control" />
+                            {% if error_heading_title %}
+                                <div class="text-danger">{{ error_heading_title }}</div>
+                            {% endif %}
+                        </div>
+                    </div>  
+                    <div class="form-group required">
+                        <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+                        <div class="col-sm-10">
+                            <select name="payment_hyperpay_tabby_status" class="form-control">
+                                <option value="0" {{ (payment_hyperpay_tabby_status == '0')?'selected="selected"':'' }}>{{ text_disabled }}</option>
+                                <option value="1" {{ (payment_hyperpay_tabby_status == '1')?'selected="selected"':'' }}>{{ text_enabled }}</option>
+                            </select>
+                        </div>
+                    </div> 
+                   
+                      
+                    <div class="form-group required">
+                        <label class="col-sm-2 control-label" for="input-testmode">{{ entry_testmode }} </label>
+                        <div class="col-sm-10">
+                            <select name="payment_hyperpay_tabby_testmode" class="form-control">
+                                <option value="0" {{ (payment_hyperpay_tabby_testmode == '0')?'selected="selected"':'' }}>{{ entry_testmode_off }}</option>
+                                <option value="1" {{ (payment_hyperpay_tabby_testmode == '1')?'selected="selected"':'' }}>{{ entry_testmode_on }}</option>
+                            </select>
+                        </div>
+                    </div>              
+                    <div class="form-group required">
+                        <label class="col-sm-2 control-label" for="input-type">{{ entry_base_currency }}</label>
+                        <div class="col-sm-10">
+                            <select name="payment_hyperpay_tabby_base_currency" class="form-control">
+                                {% for code, value in entry_all_currencies %}
+                                <option value="{{ value }}" {{ (payment_hyperpay_tabby_base_currency == value)?'selected="selected"':'' }}>{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>   
+                    <div class="form-group required">
+                                <label class="col-sm-2 control-label" for="input-type"> {{ entry_trans_type }}</label>
+                                <div class="col-sm-10">
+                                    <select name="payment_hyperpay_tabby_trans_type" class="form-control">
+                                        {% for trans_type_val, trans_type in entry_all_trans_type %}
+                                        <option value="{{ trans_type_val }}" {{ (payment_hyperpay_tabby_trans_type == trans_type_val)?'selected="selected"':'' }}> {{ trans_type }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                    </div>             
+
+                    <div class="form-group required">
+                        <label class="col-sm-2 control-label" for="input-channel">{{ entry_channel }}</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="payment_hyperpay_tabby_channel" value="{{ payment_hyperpay_tabby_channel }}" placeholder="{{ entry_channel }}" id="input-channel" class="form-control" />
+                            
+                            {% if error_channel %}
+                            <div class="text-danger">{{ error_channel }}</div>
+                            {% endif %}                    
+                        </div>
+                    </div>  
+              
+                     <div class="form-group required">
+                        <label class="col-sm-2 control-label" for="input-accesstoken">{{ entry_accesstoken }}</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="payment_hyperpay_tabby_accesstoken" value="{{ payment_hyperpay_tabby_accesstoken }}" placeholder="{{ entry_accesstoken }}" id="input-loginid" class="form-control" />
+                            
+                            {% if error_accesstoken %}
+                            <div class="text-danger">{{ error_accesstoken }}</div>
+                            {% endif %}                    
+                        </div>
+                    </div>  
+                      
+                    <div class="form-group required">
+                        <label class="col-sm-2 control-label" for="input-status">{{ entry_order_status }}</label>
+                        <div class="col-sm-10">                
+                            <select name="payment_hyperpay_tabby_order_status_id" class="form-control">
+                                {% for order_status in order_statuses %}
+                                <option value="{{ order_status.order_status_id }}" {{ (order_status.order_status_id == payment_hyperpay_tabby_order_status_id)?'selected="selected"':'' }}>{{ order_status.name }}</option>
+                                {% endfor %}
+                            </select>               
+                        </div>
+                    </div>            
+                    <div class="form-group required">
+                        <label class="col-sm-2 control-label" for="input-failed">{{ entry_order_status_failed }}</label>
+                        <div class="col-sm-10">                
+                            <select name="payment_hyperpay_tabby_order_status_failed_id" class="form-control">
+                                <option value="0" {{ ('0' == payment_hyperpay_tabby_order_status_failed_id)?'selected="selected"':'' }}>{{ text_missing }}</option>
+                                {% for order_status in order_statuses %}
+                                <option value="{{ order_status.order_status_id }}" {{ (order_status.order_status_id == payment_hyperpay_tabby_order_status_failed_id)?'selected="selected"':'' }}>{{ order_status.name }}</option>
+                                {% endfor %}
+                            </select>              
+                        </div>
+                    </div>                
+                    <div class="form-group required">
+                        <label class="col-sm-2 control-label" for="input-mailerrors">{{ entry_mailerrors }}</label>
+                        <div class="col-sm-10">          
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="payment_hyperpay_tabby_mailerrors" value="1" {{ (payment_hyperpay_tabby_mailerrors == '1')?'checked="checked"':'' }} /> {{ entry_mailerrors_enable }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>   
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="input-sort-order">{{ entry_sort_order }}</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="payment_hyperpay_tabby_sort_order" value="{{ payment_hyperpay_tabby_sort_order }}" placeholder="{{ entry_sort_order }}" id="input-sort-order" class="form-control" />
+                        </div>
+                    </div>            
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{{footer}}
