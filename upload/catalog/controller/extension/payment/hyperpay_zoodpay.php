@@ -26,7 +26,7 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
         $channel = $this->config->get('payment_hyperpay_zoodpay_channel');
         $token = $this->config->get('payment_hyperpay_zoodpay_accesstoken');
         $type = $this->config->get('payment_hyperpay_zoodpay_trans_type');
-        $amount = number_format($orderAmount ,2, '.', '');
+        $amount = number_format($orderAmount * $order_info['currency_value'] ,2, '.', '');
         $currency = $this->config->get('payment_hyperpay_zoodpay_base_currency');
         $service_code = $this->config->get('payment_hyperpay_zoodpay_service_code');
         $transactionID = $orderid;
@@ -66,7 +66,7 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
         foreach($this->cart->getProducts() as $key => $product){
            $datacontent .=
             "&cart.items[$key].name=$product[name]". // here
-            "&cart.items[$key].price=". number_format($product['price'], 2, '.', '').// here
+            "&cart.items[$key].price=". number_format($product['price']* $order_info['currency_value'], 2, '.', '').// here
             "&cart.items[$key].quantity=$product[quantity]";
             $categories[][][] =  $product['name'] ;
             
