@@ -30,7 +30,7 @@ class ControllerExtensionPaymentHyperpayStc extends Controller
         $token = $this->config->get('payment_hyperpay_stc_accesstoken');
         $type = $this->config->get('payment_hyperpay_stc_trans_type');
         $connector = $this->config->get('payment_hyperpay_stc_connector');
-        $amount = number_format(round($orderAmount, 2), 2, '.', '');
+        $amount = number_format($orderAmount * $order_info['currency_value'] ,2, '.', '');
         $currency = $this->config->get('payment_hyperpay_stc_base_currency');
         $transactionID = $orderid;
         $firstName = $order_info['payment_firstname'];

@@ -105,6 +105,7 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
         // die;
         if (curl_errno($ch)) {
                     print_r($responseData);
+                    exit;
             return curl_error($ch);
         }
         curl_close($ch);
