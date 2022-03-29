@@ -104,6 +104,7 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
         // print_r($responseData);
         // die;
         if (curl_errno($ch)) {
+                    print_r($responseData);
             return curl_error($ch);
         }
         curl_close($ch);
@@ -171,6 +172,7 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
             $failed_msg = '';
             $orderid = '';
 
+
             switch ($resultJson->result->code) {
                 case (preg_match('/^(000\.000\.|000\.100\.1|000\.[36])/', $resultJson->result->code) ? true : false):
                 case (preg_match('/^(000\.400\.0|000\.400\.100)/', $resultJson->result->code) ? true : false):
@@ -205,6 +207,7 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
                     $this->model_checkout_order->addOrderHistory($orderid, $this->config->get('payment_hyperpay_zoodpay_order_status_failed_id'), '', TRUE);
                     $this->log->write("Hyperpay: Unauthorized Transaction. Transaction Failed. $failed_msg . Order Id: $orderid");
                     $this->session->data['payment_hyperpay_zoodpay_error'] = $failed_msg;
+                    $this->session->data['payment_hyperpay_zoodpay_extended_error'] =   $resultJson->resultDetails->ExtendedDescription ?? 'f';
                     $this->response->redirect($this->url->link('extension/payment/hyperpay_zoodpay/fail', '', true));
                 }
                 exit;
@@ -263,6 +266,11 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
         return preg_match("/^[\w\s\.\-\,]*$/", $text);
     }
 
+    private function isJson($string) {
+        json_decode($string);
+        return json_last_error() === JSON_ERROR_NONE;
+     }
+
     public function fail()
     {
         $this->language->load('extension/payment/hyperpay_zoodpay');
@@ -272,6 +280,19 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
             $data['general_error'] = $this->session->data['payment_hyperpay_zoodpay_error'];
         } else {
             $data['general_error'] = $this->language->get('general_error');;
+        }
+        if (isset($this->session->data['payment_hyperpay_zoodpay_extended_error'])) {
+
+            $data['extended_error'] = $this->session->data['payment_hyperpay_zoodpay_extended_error'];
+            if($this->isJson( $data['extended_error'])){
+                $data['extended_error'] = json_decode( $data['extended_error'] , true);
+                $msges = '';
+                foreach($data['extended_error']['details'] as $error){
+                    $msges  .= $error['error'] . '<br>';
+                }
+                $data['extended_error'] = $msges;
+            };
+
         }
         $data['button_back'] = $this->language->get('button_back');
         $data['back'] = $this->url->link('common/home');
