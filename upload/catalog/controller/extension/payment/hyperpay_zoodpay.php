@@ -229,7 +229,7 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
                     $this->model_checkout_order->addOrderHistory($orderid, $this->config->get('payment_hyperpay_zoodpay_order_status_failed_id'), '', TRUE);
                     $this->log->write("Hyperpay: Unauthorized Transaction. Transaction Failed. $failed_msg . Order Id: $orderid");
                     $this->session->data['payment_hyperpay_zoodpay_error'] = $failed_msg;
-                    $this->session->data['payment_hyperpay_zoodpay_extended_error'] =   $resultJson->resultDetails->ExtendedDescription ?? 'f';
+                    $this->session->data['payment_hyperpay_zoodpay_extended_error'] =   $resultJson->resultDetails->ExtendedDescription ?? '';
                     $this->response->redirect($this->url->link('extension/payment/hyperpay_zoodpay/fail', '', true));
                 }
                 exit;
@@ -309,10 +309,13 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
             if($this->isJson( $data['extended_error'])){
                 $data['extended_error'] = json_decode( $data['extended_error'] , true);
                 $msges = '';
-                foreach($data['extended_error']['details'] as $error){
+                foreach($data['extended_error']['details'] ?? [] as $error){
                     $msges  .= $error['error'] . '<br>';
                 }
+                $msges .=( "<br>" . $data['extended_error']['message'] ?? '');
+
                 $data['extended_error'] = $msges;
+
             };
 
         }

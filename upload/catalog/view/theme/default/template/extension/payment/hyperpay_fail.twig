@@ -2,6 +2,10 @@
 <div class="container">{{ content_top }}
   <h2>{{ heading_title }}</h2>
   <p>{{ general_error }}</p>
+  {% if extended_error %}
+  <p>{{ extended_error }}</p>
+  {% endif %}
+
  {{ content_bottom }}
 </div>
 {{ footer }}
