@@ -78,10 +78,12 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
         if ($testMode == 0) {
             $scriptURL = "https://oppwa.com/v1/paymentWidgets.js?checkoutId=";
             $url = "https://oppwa.com/v1/checkouts";
+            $zoodpayConnectorUrl = 'https://zoodpay.hyperpay.com/api/getTerms';
         } else {
             $scriptURL = "https://test.oppwa.com/v1/paymentWidgets.js?checkoutId=";
             $url = "https://test.oppwa.com/v1/checkouts";
             $datacontent .= "&testMode=EXTERNAL";
+            $zoodpayConnectorUrl = 'https://zoodpay-sandbox.hyperpay.com/api/getTerms' ;
         }
 
         $datacontent .= '&customParameters[branch_id]=1';
@@ -105,7 +107,6 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
         // die;
         if (curl_errno($ch)) {
                     print_r($responseData);
-                    exit;
             return curl_error($ch);
         }
         curl_close($ch);
@@ -133,6 +134,26 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
             $url = HTTPS_SERVER;
         }
         $data['postbackURL'] = $url . 'index.php?route=extension/payment/hyperpay_zoodpay/callback';
+
+        // get terms and conditions of zoodpay
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $zoodpayConnectorUrl);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, ['entity_id' => $channel]);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $responseData = curl_exec($ch);
+        if (curl_errno($ch)) {
+            print_r($responseData);
+            return curl_error($ch);
+        }
+        curl_close($ch);
+
+        $result = json_decode($responseData , true);
+        $result['amount'] = $amount ;
+        $data['termsAndContitions'] =  $result ;
+
 
         return $this->load->view('extension/payment/hyperpay_zoodpay', $data);
     }

@@ -1,54 +1,98 @@
 <style>
-form {
-    display:block;
-}
+    form {
+        display: block;
+    }
+
+    .wpwl-container-virtualAccount-ZOODPAY {
+        display: inline-block;
+    }
+
+    
+    a {
+        cursor: pointer;
+    }
+
 </style>
 
 <script>
     var wpwlOptions = {
-    style: "plain",
-	paymentTarget: "_top",
-	locale: "{{ language_code }}",
-	onReady: function(){
+        style: "plain",
+        paymentTarget: "_top",
+        locale: "{{ language_code }}",
+        onReady: function () {
 
-    $('.wpwl-form-virtualAccount-zoodpay .wpwl-wrapper-radio-qrcode').hide();
-    $('.wpwl-form-virtualAccount-zoodpay .wpwl-wrapper-radio-mobile').hide();
-    $('.wpwl-form-virtualAccount-zoodpay .wpwl-group-paymentMode').hide();
-    $('.wpwl-form-virtualAccount-zoodpay .wpwl-group-mobilePhone').show();
-    $('.wpwl-form-virtualAccount-zoodpay .wpwl-wrapper-radio-mobile .wpwl-control-radio-mobile').attr('checked',true);
-    $('.wpwl-form-virtualAccount-zoodpay .wpwl-wrapper-radio-mobile .wpwl-control-radio-mobile').trigger('click');
+            $('.wpwl-form-virtualAccount-zoodpay .wpwl-wrapper-radio-qrcode').hide();
+            $('.wpwl-form-virtualAccount-zoodpay .wpwl-wrapper-radio-mobile').hide();
+            $('.wpwl-form-virtualAccount-zoodpay .wpwl-group-paymentMode').hide();
+            $('.wpwl-form-virtualAccount-zoodpay .wpwl-group-mobilePhone').show();
+            $('.wpwl-form-virtualAccount-zoodpay .wpwl-wrapper-radio-mobile .wpwl-control-radio-mobile').attr(
+                'checked', true);
+            $('.wpwl-form-virtualAccount-zoodpay .wpwl-wrapper-radio-mobile .wpwl-control-radio-mobile')
+                .trigger('click');
 
-    },
+        },
 
     };
-
-
 </script>
 {% if language_code == 'ar' %}
 <style>
-.wpwl-group{
-	direction:ltr !important;
-}
-.wpwl-control-cardNumber{
-direction:ltr !important;
-text-align:right;
-}
+    .wpwl-group {
+        direction: ltr !important;
+    }
+
+    .wpwl-control-cardNumber {
+        direction: ltr !important;
+        text-align: right;
+    }
+
 </style>
 {% endif %}
 
 <script>
-$.ajaxSetup({
-    // Disable caching of AJAX responses
-    cache: true
-});
+    $.ajaxSetup({
+        // Disable caching of AJAX responses
+        cache: true
+    });
+
+
+    function openModal(text) {
+        jQuery(".modal-body").empty().html(text);
+    }
 </script>
 
 <script src="{{ scriptURL }}"></script>
 
+
+
 <div>
-    <form action="{{ postbackURL }}" class="paymentWidgets"  data-brands="ZOODPAY">
+    <form action="{{ postbackURL }}" class="paymentWidgets" data-brands="ZOODPAY">
     </form>
 </div>
-<div class="buttons" style="display:none;">
-  <div class="right"><a id="button-confirm" class="button" onclick="$('#payment').submit();"><span>{{ button_confirm }}</span></a></div>
+
+<div class='terms-container'>
+    <div>
+        <h4> {{ termsAndContitions.instalments }} Instalment of
+            {{termsAndContitions.amount / termsAndContitions.instalments}}/mo. </h4>
+        <a data-target="#hyperpayModal" data-toggle="modal"><b> Terms and Conditions</b> </a>
+    </div>
+</div>
+
+
+<div class="modal fade" id="hyperpayModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="modalLabel">Terms and Conditions</h4>
+            </div>
+            <div class="modal-body">
+                {{ termsAndContitions.description }}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
