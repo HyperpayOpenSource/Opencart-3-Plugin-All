@@ -1,11 +1,11 @@
 <?php
 // Text
-$_['text_title'] = 'CreditCards Payments';
+$_['text_title'] = 'البطاقة الإتمانية';
 
-$_['heading_title'] = 'CreditCards Payments';
+$_['heading_title'] = 'البطاقة الإتمانية';
 
 // Error Text
-$_['general_error'] = 'Unfortunately there was an error processing your Payment transaction. Please try again later.';
-$_['button_back'] = 'Back';
+$_['general_error'] = 'نعتذر هناك خطأ في اكمال عملية الدفع، يرجى المحاولة لاحقا.';
+$_['button_back'] = 'رجوع';
 
 ?>

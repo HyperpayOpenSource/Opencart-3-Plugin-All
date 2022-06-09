@@ -8,7 +8,7 @@ class ModelExtensionPaymentHyperpay extends Model {
         $method_data = array(
             'code'       => 'hyperpay',
             'terms'      => '',
-            'title'      => $this->config->get('payment_hyperpay_heading_title'),
+            'title'      => $this->language->get('heading_title'),
             'sort_order' => $this->config->get('payment_hyperpay_sort_order')
         );
 
