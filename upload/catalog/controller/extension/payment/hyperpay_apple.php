@@ -51,6 +51,7 @@ class ControllerExtensionPaymentHyperpayApple extends Controller
             "&currency=$currency" .
             "&paymentType=$type" .
             "&merchantTransactionId=$transactionID" .
+            "&customParameters[plugin]=opencart" .
             "&customer.email=$email";
 
         $firstNameBilling = preg_replace('/\s/', '', str_replace("&", "", $firstName));

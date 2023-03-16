@@ -53,6 +53,7 @@ class ControllerExtensionPaymentHyperpay extends Controller
             "&currency=$currency" .
             "&paymentType=$type" .
             "&merchantTransactionId=$transactionID" .
+            "&customParameters[plugin]=opencart" .
             "&customer.email=$email";
 
         $datacontent .= '&customParameters[branch_id]=1';

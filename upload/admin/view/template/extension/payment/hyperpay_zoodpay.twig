@@ -96,6 +96,28 @@
                         </div>
                     </div>  
 
+                    <div class="form-group required">
+                        <label class="col-sm-2 control-label" for="payment_hyperpay_zoodpay_webhook_key">{{ webhook_key }}</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="payment_hyperpay_zoodpay_webhook_key" value="{{ payment_hyperpay_zoodpay_webhook_key }}" placeholder="{{ webhook_key }}" id="input-loginid" class="form-control" />
+                            
+                            {% if error_webhook_key %}
+                            <div class="text-danger">{{ error_webhook_key }}</div>
+                            {% endif %}                    
+                        </div>
+                    </div>  
+
+                    <div class="form-group required">
+                        <label class="col-sm-2 control-label" for="payment_hyperpay_zoodpay_webhook_url">{{ webhook_url }}</label>
+                        <div class="col-sm-10">
+                            <input readonly type="text" name="payment_hyperpay_zoodpay_webhook_url" value="{{ payment_hyperpay_zoodpay_webhook_url }}" placeholder="{{ payment_hyperpay_zoodpay_webhook_url }}" id="input-loginid" class="form-control" />
+                            
+                            {% if error_webhook_url %}
+                            <div class="text-danger">{{ error_webhook_url }}</div>
+                            {% endif %}                    
+                        </div>
+                    </div>  
+
                      <div class="form-group required">
                         <label class="col-sm-2 control-label" for="input-service_code">{{ service_code }}</label>
                         <div class="col-sm-10">

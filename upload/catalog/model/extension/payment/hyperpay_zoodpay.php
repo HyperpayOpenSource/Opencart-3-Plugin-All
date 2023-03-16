@@ -1,8 +1,9 @@
 <?php
 
-class ModelExtensionPaymentHyperpayZoodPay extends Model
+class ModelExtensionPaymentHyperpayZoodpay extends Model
 {
 
+    public static $test  = "ii";
     public function getMethod($address, $total)
     {
 
@@ -46,5 +47,9 @@ class ModelExtensionPaymentHyperpayZoodPay extends Model
         );
 
         return $method_data ?? [];
+    }
+
+    public function get_config(){
+        return $this->config;
     }
 }

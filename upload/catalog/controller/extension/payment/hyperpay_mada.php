@@ -54,6 +54,7 @@ class ControllerExtensionPaymentHyperpayMada extends Controller
             "&currency=$currency" .
             "&paymentType=$type" .
             "&merchantTransactionId=$transactionID" .
+            "&customParameters[plugin]=opencart" .
             "&customer.email=$email";
 
         if ($tokenization && $customer_id > 0) {

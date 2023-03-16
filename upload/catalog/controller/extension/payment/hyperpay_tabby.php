@@ -49,6 +49,7 @@ class ControllerExtensionPaymentHyperpayTabby extends Controller
             "&customer.givenName=$firstNameBilling".
             "&customer.surname=$surNameBilling".
             "&merchantTransactionId=$transactionID" .
+            "&customParameters[plugin]=opencart" .
             "&customer.email=$email";
         
         foreach($this->cart->getProducts() as $key => $product){

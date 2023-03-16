@@ -8,10 +8,12 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
     public function index()
     {
 
+
         $this->load->language('extension/payment/hyperpay_zoodpay');
         $this->document->setTitle($this->language->get('heading_title'));
         $this->load->model('setting/setting');
         $data['heading_title'] = $this->language->get('heading_title');
+
 
         if (($this->request->server['REQUEST_METHOD'] == 'POST') && ($this->validate())) {
 
@@ -100,6 +102,9 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
 
         $data['entry_accesstoken'] = $this->language->get('entry_accesstoken');
 
+        $data['webhook_key'] = $this->language->get('webhook_key');
+        $data['webhook_url'] = $this->language->get('webhook_url');
+
 
         $data['service_code'] = $this->language->get('service_code');
 
@@ -169,6 +174,15 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
         } else {
             $data['payment_hyperpay_zoodpay_accesstoken'] = $this->config->get('payment_hyperpay_zoodpay_accesstoken');
         }
+
+        if (isset($this->request->post['payment_hyperpay_zoodpay_webhook_key'])) {
+            $data['payment_hyperpay_zoodpay_webhook_key'] = $this->request->post['payment_hyperpay_zoodpay_webhook_key'];
+        } else {
+            $data['payment_hyperpay_zoodpay_webhook_key'] = $this->config->get('payment_hyperpay_zoodpay_webhook_key');
+        }
+
+        $data['payment_hyperpay_zoodpay_webhook_url'] = "https://" . $_SERVER['HTTP_HOST'] . "/index.php?route=extension/payment/hyperpay_api&method=hyperpay_zoodpay";
+
 
         if (isset($this->request->post['payment_hyperpay_zoodpay_brands'])) {
             $data['payment_hyperpay_zoodpay_brands'] = $this->request->post['payment_hyperpay_zoodpay_brands'];
