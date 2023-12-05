@@ -294,6 +294,7 @@ class ControllerExtensionPaymentHyperpay extends Controller
             'PAYPAL' => 'PayPal',
             'MASTER' => 'Master Card',
             'AMEX' => 'American Express',
+            'JCB' => 'JCB',
         );
 
         return $hyperpay_payments;
