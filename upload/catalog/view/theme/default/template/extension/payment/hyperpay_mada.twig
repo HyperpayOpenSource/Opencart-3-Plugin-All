@@ -40,6 +40,9 @@
             "hideInitialPaymentForms": "true",
             "requireCvv": "true"
         },
+         browser: {
+           threeDChallengeWindow: 5
+       },
         locale: "{{ language_code }}",
         onReady: function () {
             $('.wpwl-wrapper-cardNumber').each(function () {

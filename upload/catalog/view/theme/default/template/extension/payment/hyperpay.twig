@@ -12,6 +12,9 @@ form {
         "hideInitialPaymentForms": "true",
         "requireCvv": "true"
     },
+     browser: {
+           threeDChallengeWindow: 5
+       },
 	locale: "{{ language_code }}",
 	onReady: function(){
 {% if tokenization == 1 %}
