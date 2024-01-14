@@ -8,6 +8,9 @@ form {
     var wpwlOptions = {
     style: "{{ formStyle }}",
 	paymentTarget: "_top",
+     browser: {
+           threeDChallengeWindow: 5
+       },
 	locale: "{{ language_code }}"
     };
     wpwlOptions.applePay = {
