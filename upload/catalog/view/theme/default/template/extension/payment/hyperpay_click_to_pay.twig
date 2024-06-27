@@ -1,0 +1,88 @@
+<style>
+form {
+    display:block;
+}
+</style>
+
+<script>
+    var wpwlOptions = {
+    onReady: function () {
+      jQuery('.wpwl-container-virtualAccount-CLICK_TO_PAY').after(jQuery('.wpwl-container-card '))
+    },
+  
+    onError: function (e) {
+      if (['not_enrolled', "add_new_card", "otp_channel_invalid"].includes(e.event)) {
+        jQuery('.wpwl-form-card').show()
+        window.location.href = `#${jQuery('.wpwl-container-card')[0].id}`
+      }
+    },
+  
+    clickToPay: {
+      "cardList": {
+        "displayCardListByDefault": true,
+        "displayCancelOption": true,
+        "displayAddCard": true,
+        "displayPreferredCard": false,
+        "displaySignOut": true,
+        "displayHeader": false,
+        "cardSelectionType": 'gridView',
+        "unacceptedCard": '',
+  
+      },
+      "otpScreen": {
+        "displayOtpScreenByDefault": false,
+        "displayCancelOption": true,
+        "displayHeader": true,
+        //"type": 'overlay',
+        "autoSubmit": false,
+        "hideLoader": false,
+        "displayRememberMe": false,
+        "otpResendLoading": false,
+        "displayPayAnotherWay": true
+      },
+      "srcMark": {
+        "height": '40',
+        "width": '200',
+        "darkTheme": false
+      },
+      "learnMore": {
+        "displayCloseButton": true,
+        "displayOkButton": true,
+      }
+  
+    }, //clickToPay
+   paymentTarget: "_top",
+    style: "card"
+  } //wpwlOptions
+
+
+</script>
+{% if language_code == 'ar' %}
+<style>
+.wpwl-group{
+	direction:ltr !important;
+}
+.wpwl-control-cardNumber{
+direction:ltr !important;
+text-align:right;
+}
+</style>
+{% endif %}
+
+<script>
+$.ajaxSetup({
+    // Disable caching of AJAX responses
+    cache: true
+});
+</script>
+
+<script src="{{ scriptURL }}"></script>
+
+<div>
+    <form action="{{ postbackURL }}" class="paymentWidgets"  data-brands="CLICK_TO_PAY VISA MASTER AMEX JCB">
+
+    </form>
+</div>
+<div class="buttons" style="display:none;">
+  <div class="right"><a id="button-confirm" class="button" onclick="$('#payment').submit();"><span>{{ button_confirm }}</span></a></div>
+</div>
