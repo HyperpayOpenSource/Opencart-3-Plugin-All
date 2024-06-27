@@ -273,7 +273,8 @@ class ControllerExtensionPaymentHyperpayApple extends Controller
     private function get_hyperpay_apple_payment_methods()
     {
         $hyperpay_apple_payments = array(
-            'APPLEPAY' => 'ApplePay'
+            'APPLEPAY' => 'ApplePay',
+            'APPLEPAYTKN' => 'ApplePay Token',
         );
 
         return $hyperpay_apple_payments;
