@@ -53,6 +53,7 @@ class ControllerExtensionPaymentHyperpay extends Controller
             "&currency=$currency" .
             "&paymentType=$type" .
             "&merchantTransactionId=$transactionID" .
+            "&integrity=true" .
             "&customer.email=$email";
 
         $datacontent .= '&customParameters[branch_id]=1';
@@ -123,14 +124,20 @@ class ControllerExtensionPaymentHyperpay extends Controller
         $result = json_decode($responseData);
         //var_dump($result);exit;
         $token = '';
+        $integrity  = '';
 
         if (isset($result->id)) {
             $token = $result->id;
         }
 
+        if (isset($result->integrity)) {
+            $integrity = $result->integrity;
+        }
+
         $payment_brands = implode(' ', $this->config->get('payment_hyperpay_brands'));
         //--------------------------------------
         $data['token'] = $token;
+        $data['integrity'] = $integrity;
         $data['payment_brands'] = $payment_brands;
         $data['scriptURL'] = $scriptURL . $token;
 

@@ -48,6 +48,7 @@ class ControllerExtensionPaymentHyperpayApple extends Controller
         $lang = explode('-', $this->session->data['language']);
         $datacontent = "entityId=$channel" .
             "&amount=$amount" .
+            "&integrity=true" .
             "&currency=$currency" .
             "&paymentType=$type" .
             "&merchantTransactionId=$transactionID" .
@@ -101,14 +102,21 @@ class ControllerExtensionPaymentHyperpayApple extends Controller
         $result = json_decode($responseData);
         //var_dump($result);exit;
         $token = '';
+        $integrity = '';
 
         if (isset($result->id)) {
             $token = $result->id;
         }
 
+        
+        if (isset($result->integrity)) {
+            $integrity = $result->integrity;
+        }
+
         $payment_brands = implode(' ', $this->config->get('payment_hyperpay_apple_brands'));
         //--------------------------------------
         $data['token'] = $token;
+        $data['integrity'] = $integrity;
         $data['payment_brands'] = $payment_brands;
         $data['supportedNetworks'] = json_encode($this->config->get('payment_hyperpay_apple_supported_networks'));
         $data['scriptURL'] = $scriptURL . $token;

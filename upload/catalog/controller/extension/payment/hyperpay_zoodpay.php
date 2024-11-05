@@ -48,6 +48,7 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
 
         $datacontent = "entityId=$channel" .
             "&amount=$amount" .
+            "&integrity=true" .
             "&merchantTransactionId=$transactionID" .
             "&currency=$currency" .
             "&paymentType=$type" .
@@ -114,13 +115,19 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
         $result = json_decode($responseData);
         //var_dump($result);exit;
         $token = '';
+        $integrity = '';
 
         if (isset($result->id)) {
             $token = $result->id;
         }
 
+        if (isset($result->integrity)) {
+            $integrity = $result->integrity;
+        }
+
         //--------------------------------------
         $data['token'] = $token;
+        $data['integrity'] = $integrity;
         $data['scriptURL'] = $scriptURL . $token;
 
 
