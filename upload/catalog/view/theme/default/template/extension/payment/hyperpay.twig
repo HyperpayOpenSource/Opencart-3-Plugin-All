@@ -1,10 +1,10 @@
-<style>
+<style nonce="{{ nonce }}">
 form {
     display:block;
 }
 </style>
 
-<script>
+<script nonce="{{ nonce }}" >
     var wpwlOptions = {
     style: "{{ formStyle }}",
 	paymentTarget: "_top",
@@ -33,7 +33,7 @@ form {
 
 </script>
 {% if language_code == 'ar' %}
-<style>
+<style nonce="{{ nonce }}">
 .wpwl-group{
 	direction:ltr !important;
 }
@@ -44,7 +44,7 @@ text-align:right;
 </style>
 {% endif %}
 
-<script>
+<script nonce="{{ nonce }}">
 $.ajaxSetup({
     // Disable caching of AJAX responses
     cache: true

@@ -18,6 +18,21 @@ class ControllerExtensionPaymentHyperpay extends Controller
             $url = "https://test.oppwa.com/v1/checkouts";
         }
 
+        $domain =  $testMode ? 'https://eu-test.oppwa.com' : 'https://eu-prod.oppwa.com';
+        $nonce = rand(11111,99999);
+        $data['nonce'] = $nonce;
+
+        $contentMeta = "
+                    style-src 'self' $domain 'unsafe-inline';
+                    frame-src 'self' $domain;
+                    script-src 'self' $domain 'nonce-$nonce';
+                    connect-src 'self' $domain;
+                    img-src 'self' $domain;
+            ";
+
+
+
+
         // Amount
         $order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
         $orderAmount = $order_info['total'];
@@ -30,7 +45,7 @@ class ControllerExtensionPaymentHyperpay extends Controller
         $token = $this->config->get('payment_hyperpay_accesstoken');
         $type = $this->config->get('payment_hyperpay_trans_type');
         $connector = $this->config->get('payment_hyperpay_connector');
-        $amount = number_format($orderAmount * $order_info['currency_value'] ,2, '.', '');
+        $amount = number_format($orderAmount * $order_info['currency_value'], 2, '.', '');
         $currency = $this->config->get('payment_hyperpay_base_currency');
         $transactionID = $orderid;
         $firstName = $order_info['payment_firstname'];
@@ -151,6 +166,7 @@ class ControllerExtensionPaymentHyperpay extends Controller
             $url = HTTPS_SERVER;
         }
         $data['postbackURL'] = $url . 'index.php?route=extension/payment/hyperpay/callback';
+        $data['meta'] = $contentMeta;
 
         return $this->load->view('extension/payment/hyperpay', $data);
     }
@@ -207,16 +223,15 @@ class ControllerExtensionPaymentHyperpay extends Controller
                         $failed_msg = $resultJson->result->description;
 
                         if (isset($resultJson->card->bin)) {
-                          $blackBins = $this->getMadaBlackBins();
-                          $searchBin = $resultJson->card->bin;
-                          if (in_array($searchBin,$blackBins)) {
-                            if($this->config->get('config_language') == 'ar'){
-                              $failed_msg = 'عذرا! يرجى اختيار خيار الدفع "مدى" لإتمام عملية الشراء بنجاح.';
-                            }else{
-                              $failed_msg = 'Sorry! Please select "mada" payment option in order to be able to complete your purchase successfully.';
+                            $blackBins = $this->getMadaBlackBins();
+                            $searchBin = $resultJson->card->bin;
+                            if (in_array($searchBin, $blackBins)) {
+                                if ($this->config->get('config_language') == 'ar') {
+                                    $failed_msg = 'عذرا! يرجى اختيار خيار الدفع "مدى" لإتمام عملية الشراء بنجاح.';
+                                } else {
+                                    $failed_msg = 'Sorry! Please select "mada" payment option in order to be able to complete your purchase successfully.';
+                                }
                             }
-
-                          }
                         }
                     }
             }
@@ -334,102 +349,102 @@ class ControllerExtensionPaymentHyperpay extends Controller
 
     private function getMadaBlackBins()
     {
-      return array(
-        "588845",
-        "440647",
-        "440795",
-        "446404",
-        "457865",
-        "968208",
-        "588846",
-        "493428",
-        "539931",
-        "558848",
-        "557606",
-        "968210",
-        "636120",
-        "417633",
-        "468540",
-        "468541",
-        "468542",
-        "468543",
-        "968201",
-        "446393",
-        "409201",
-        "458456",
-        "484783",
-        "968205",
-        "462220",
-        "455708",
-        "588848",
-        "455036",
-        "968203",
-        "486094",
-        "486095",
-        "486096",
-        "504300",
-        "440533",
-        "489318",
-        "489319",
-        "445564",
-        "968211",
-        "401757",
-        "410685",
-        "406996",
-        "432328",
-        "428671",
-        "428672",
-        "428673",
-        "968206",
-        "446672",
-        "543357",
-        "434107",
-        "407197",
-        "407395",
-        "412565",
-        "431361",
-        "604906",
-        "521076",
-        "588850",
-        "968202",
-        "529415",
-        "535825",
-        "543085",
-        "524130",
-        "554180",
-        "549760",
-        "588849",
-        "968209",
-        "524514",
-        "529741",
-        "537767",
-        "535989",
-        "536023",
-        "513213",
-        "520058",
-        "585265",
-        "588983",
-        "588982",
-        "589005",
-        "508160",
-        "531095",
-        "530906",
-        "532013",
-        "605141",
-        "968204",
-        "422817",
-        "422818",
-        "422819",
-        "428331",
-        "483010",
-        "483011",
-        "483012",
-        "589206",
-        "968207",
-        "419593",
-        "439954",
-        "530060",
-        "531196"
-      );
+        return array(
+            "588845",
+            "440647",
+            "440795",
+            "446404",
+            "457865",
+            "968208",
+            "588846",
+            "493428",
+            "539931",
+            "558848",
+            "557606",
+            "968210",
+            "636120",
+            "417633",
+            "468540",
+            "468541",
+            "468542",
+            "468543",
+            "968201",
+            "446393",
+            "409201",
+            "458456",
+            "484783",
+            "968205",
+            "462220",
+            "455708",
+            "588848",
+            "455036",
+            "968203",
+            "486094",
+            "486095",
+            "486096",
+            "504300",
+            "440533",
+            "489318",
+            "489319",
+            "445564",
+            "968211",
+            "401757",
+            "410685",
+            "406996",
+            "432328",
+            "428671",
+            "428672",
+            "428673",
+            "968206",
+            "446672",
+            "543357",
+            "434107",
+            "407197",
+            "407395",
+            "412565",
+            "431361",
+            "604906",
+            "521076",
+            "588850",
+            "968202",
+            "529415",
+            "535825",
+            "543085",
+            "524130",
+            "554180",
+            "549760",
+            "588849",
+            "968209",
+            "524514",
+            "529741",
+            "537767",
+            "535989",
+            "536023",
+            "513213",
+            "520058",
+            "585265",
+            "588983",
+            "588982",
+            "589005",
+            "508160",
+            "531095",
+            "530906",
+            "532013",
+            "605141",
+            "968204",
+            "422817",
+            "422818",
+            "422819",
+            "428331",
+            "483010",
+            "483011",
+            "483012",
+            "589206",
+            "968207",
+            "419593",
+            "439954",
+            "530060",
+            "531196"
+        );
     }
 }
