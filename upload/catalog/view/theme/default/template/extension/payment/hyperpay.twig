@@ -1,10 +1,12 @@
-<style>
+<style nonce="{{ nonce }}">
 form {
     display:block;
 }
 </style>
 
-<script>
+
+
+<script nonce="{{ nonce }}" >
     var wpwlOptions = {
     style: "{{ formStyle }}",
 	paymentTarget: "_top",
@@ -12,11 +14,9 @@ form {
         "hideInitialPaymentForms": "true",
         "requireCvv": "true"
     },
-     browser: {
-           threeDChallengeWindow: 5
-       },
 	locale: "{{ language_code }}",
 	onReady: function(){
+        jQuery('.wpwl-group.wpwl-group-brand').hide() ;
 {% if tokenization == 1 %}
         var storeMsg = 'Store payment details?';
         var style = 'style="direction: ltr"';
@@ -31,12 +31,24 @@ form {
 
     },
 
+    onBlurCardNumber: function (isValid) {
+        let paymentBrand = this.$form.find('.wpwl-control-brand').val();
+        if (paymentBrand == "MADA") {
+            setTimeout(function () {
+                jQuery('.wpwl-hint-cardNumberError').remove();
+                jQuery('.wpwl-control-cardNumber').removeClass('wpwl-has-error');
+                jQuery('.wpwl-control-cardNumber').addClass('wpwl-has-error').after('<div class="wpwl-hint wpwl-hint-cardNumberError">mada card is not allowed, please choose mada debit card from the payment options</div>');
+                jQuery('.wpwl-button-pay').prop('disabled', true);
+            }, 5);
+        }
+    },
+
     };
 
 
 </script>
 {% if language_code == 'ar' %}
-<style>
+<style nonce="{{ nonce }}">
 .wpwl-group{
 	direction:ltr !important;
 }
@@ -47,17 +59,17 @@ text-align:right;
 </style>
 {% endif %}
 
-<script>
+<script nonce="{{ nonce }}">
 $.ajaxSetup({
     // Disable caching of AJAX responses
     cache: true
 });
 </script>
 
-<script src="{{ scriptURL }}"></script>
+<script crossorigin="anonymous" integrity="{{ integrity }}" src="{{ scriptURL }}"></script>
 
 <div>
-    <form action="{{ postbackURL }}" class="paymentWidgets"  data-brands="{{ payment_brands }}">
+    <form action="{{ postbackURL }}" class="paymentWidgets"  data-brands="{{ payment_brands }} MADA">
 
     </form>
 </div>
