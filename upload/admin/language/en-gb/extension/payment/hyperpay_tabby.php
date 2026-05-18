@@ -5,8 +5,8 @@ $_['heading_title'] = 'HyperPay Tabby';
 
 // Text
 $_['text_payment'] = 'Payment';
-$_['text_hyperpay_tabby'] = '<a onclick="window.open(\'http//www.hyperpay.com\');"><img src="view/image/payment/hyperpay.png" alt="HyperPay" title="HyperPay" style="border 1px solid #EEEEEE;" /></a>';
-$_['text_edit']      = 'Edit HyperPay';
+$_['text_hyperpay_tabby'] = '<a onclick="window.open(\'http//www.hyperpay.com\');"><img src="view/image/payment/TABBY.svg" alt="HyperPay" title="HyperPay" width="100" height="30" style="border: 1px solid #EEEEEE;" /></a>';
+$_['text_edit']      = 'Edit HyperPay Tabby';
 
 // Entry
 $_['entry_status'] = 'Status';
@@ -50,7 +50,7 @@ $_['error_password'] = 'Password is Required!';
 
 // Text
 $_['text_success'] = 'Success You have modified HyperPay payment module details!';
-$_['text_hyperpay_tabby_info'] = '<a onclick="window.open(\'http//www.hyperpay.com\');"><img height="100" style="floatright;" src="view/image/payment/hyperpay_info.jpg" width="200"></a><h4 style="margin0;padding0;">HyperPay Payment Information</h4>With Ewire you can accept payments from following paymentcards Dankort,Visa,Visa Electron,Mastercard,Maestro,Mastercard Direct.For danish customers it is also possible to deposit with netbanking.If you need help for the payment module, <a target="_blank" href="http//www.ewire.dk/en/module-support/ewire-payment-module-support.aspx">click here for a Payment module description</a>';
+$_['text_hyperpay_tabby_info'] = '<a onclick="window.open(\'http//www.hyperpay.com\');"><img height="100" style="float: right;" src="view/image/payment/hyperpay_info.jpg" width="200"></a><h4 style="margin: 0; padding: 0;">HyperPay Payment Information</h4>With Ewire you can accept payments from following paymentcards Dankort,Visa,Visa Electron,Mastercard,Maestro,Mastercard Direct.For danish customers it is also possible to deposit with netbanking.If you need help for the payment module, <a target="_blank" href="http//www.ewire.dk/en/module-support/ewire-payment-module-support.aspx">click here for a Payment module description</a>';
 
 
 // Entry
