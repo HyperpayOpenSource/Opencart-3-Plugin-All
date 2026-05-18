@@ -120,7 +120,7 @@ class ControllerExtensionPaymentHyperpayApple extends Controller
         if (isset($_GET['id'])) {
             $this->load->model('checkout/order');
 
-            $checkoutId = preg_replace('/[^a-zA-Z0-9_\-]/', '', $_GET['id']);
+            $checkoutId = preg_replace('/[^a-zA-Z0-9_\-.]/', '', $_GET['id']);
             if (empty($checkoutId)) { exit; }
 
             $testMode = $this->config->get('payment_hyperpay_apple_testmode');
