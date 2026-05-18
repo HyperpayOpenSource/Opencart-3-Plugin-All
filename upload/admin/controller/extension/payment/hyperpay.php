@@ -29,11 +29,9 @@ class ControllerExtensionPaymentHyperpay extends Controller
 
         if (($this->request->server['REQUEST_METHOD'] == 'POST') && ($this->validate())) {
 
-            //$this->model_setting_setting->editSetting('hyperpay',  $this->request->post);
             $this->model_setting_setting->editSetting('payment_hyperpay',  $this->request->post);
             $this->session->data['success'] = $this->language->get('text_success');
 
-            //$this->response->redirect($this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'], true));
             $this->response->redirect($this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=payment', true));
         }
 

@@ -8,7 +8,7 @@ class ControllerExtensionPaymentHyperpayValu extends Controller
         $this->language->load('extension/payment/hyperpay_valu');
         $this->load->model('checkout/order');
         $data['button_confirm'] = $this->language->get('button_confirm');
-        //--------------------------------------
+
         $testMode = $this->config->get('payment_hyperpay_valu_testmode');
         if ($testMode == 0) {
             $scriptURL = "https://oppwa.com/v1/paymentWidgets.js?checkoutId=";
@@ -18,16 +18,13 @@ class ControllerExtensionPaymentHyperpayValu extends Controller
             $url = "https://test.oppwa.com/v1/checkouts";
         }
 
-        // Amount
         $order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
         $orderAmount = $order_info['total'];
         $orderid = $this->session->data['order_id'];
-        $customer_id = $order_info['customer_id'];
-
 
         $channel = $this->config->get('payment_hyperpay_valu_channel');
         $mode = $this->config->get('payment_hyperpay_valu_trans_mode');
-        $token = $this->config->get('payment_hyperpay_valu_accesstoken');
+        $accessToken = $this->config->get('payment_hyperpay_valu_accesstoken');
         $type = $this->config->get('payment_hyperpay_valu_trans_type');
         $connector = $this->config->get('payment_hyperpay_valu_connector');
         $currency = $this->config->get('payment_hyperpay_valu_base_currency');
@@ -37,17 +34,10 @@ class ControllerExtensionPaymentHyperpayValu extends Controller
         $firstName = $order_info['payment_firstname'];
         $family = $order_info['payment_lastname'];
         $street = $order_info['payment_address_1'];
-        $zip = $order_info['payment_postcode'];
         $city = $order_info['payment_city'];
-        $state = $order_info['payment_zone'];
         $country = $order_info['payment_iso_code_2'];
         $email = $order_info['email'];
-        $ip = $order_info['ip'];
 
-        if (empty($state)) {
-            $state = $city;
-        }
-        $lang = explode('-', $this->session->data['language']);
         $datacontent = "entityId=$channel" .
             "&amount=$amount" .
             "&currency=$currency" .
@@ -60,8 +50,6 @@ class ControllerExtensionPaymentHyperpayValu extends Controller
         $datacontent .= '&customParameters[device_id]=1';
         $datacontent .= '&customParameters[bill_number]=' . $transactionID;
         $datacontent .= '&customParameters[locale]=' . $this->session->data['language'];
-
-
 
         $firstNameBilling = preg_replace('/\s/', '', str_replace("&", "", $firstName));
         $surNameBilling = preg_replace('/\s/', '', str_replace("&", "", $family));
@@ -95,11 +83,11 @@ class ControllerExtensionPaymentHyperpayValu extends Controller
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            'Authorization:Bearer ' . $token
+            'Authorization:Bearer ' . $accessToken
         ));
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $datacontent);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $responseData = curl_exec($ch);
         if (curl_errno($ch)) {
@@ -107,20 +95,17 @@ class ControllerExtensionPaymentHyperpayValu extends Controller
         }
         curl_close($ch);
 
-
         $result = json_decode($responseData);
-        //var_dump($result);exit;
-        $token = '';
+        $checkoutId = '';
 
         if (isset($result->id)) {
-            $token = $result->id;
+            $checkoutId = $result->id;
         }
 
         $payment_brands = implode(' ', $this->config->get('payment_hyperpay_valu_brands'));
-        //--------------------------------------
-        $data['token'] = $token;
+        $data['token'] = $checkoutId;
         $data['payment_brands'] = $payment_brands;
-        $data['scriptURL'] = $scriptURL . $token;
+        $data['scriptURL'] = $scriptURL . $checkoutId;
 
         $data['formStyle'] = $this->config->get('payment_hyperpay_valu_payment_style');
         $data['language_code'] = $this->session->data['language'];
@@ -140,14 +125,15 @@ class ControllerExtensionPaymentHyperpayValu extends Controller
         if (isset($_GET['id'])) {
             $this->load->model('checkout/order');
 
-            $token = $_GET["id"];
+            $checkoutId = preg_replace('/[^a-zA-Z0-9_\-]/', '', $_GET['id']);
+            if (empty($checkoutId)) { exit; }
 
             $testMode = $this->config->get('payment_hyperpay_valu_testmode');
 
             if ($testMode == 0) {
-                $url = "https://oppwa.com/v1/checkouts/$token/payment";
+                $url = "https://oppwa.com/v1/checkouts/$checkoutId/payment";
             } else {
-                $url = "https://test.oppwa.com/v1/checkouts/$token/payment";
+                $url = "https://test.oppwa.com/v1/checkouts/$checkoutId/payment";
             }
             $url .= "?entityId=" . trim($this->config->get('payment_hyperpay_valu_channel'));
             $accesstoken = $this->config->get('payment_hyperpay_valu_accesstoken');
@@ -158,7 +144,7 @@ class ControllerExtensionPaymentHyperpayValu extends Controller
             ));
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
 
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             $responseData = curl_exec($ch);
             if (curl_errno($ch)) {
@@ -177,7 +163,7 @@ class ControllerExtensionPaymentHyperpayValu extends Controller
                     $success = 1;
                     break;
                 default:
-                    if ($resultJson->paymentBrand == 'SADAD') {
+                    if (($resultJson->paymentBrand ?? '') == 'SADAD') {
                         if (isset($resultJson->resultDetails->ErrorMessage)) {
                             $failed_msg = $resultJson->resultDetails->Error;
                         } else {
@@ -189,10 +175,7 @@ class ControllerExtensionPaymentHyperpayValu extends Controller
             }
             $orderid = $resultJson->merchantTransactionId;
 
-
-
             $order_info = $this->model_checkout_order->getOrder($orderid);
-
 
             if ($order_info) {
                 if ($success == 1) {
@@ -219,7 +202,6 @@ class ControllerExtensionPaymentHyperpayValu extends Controller
                     $this->sendEmail($this->config->get('config_email'), 'Hyperpay callback failed!', $message);
                 }
 
-                //$this->model_checkout_order->confirm($orderid, $this->config->get('payment_hyperpay_valu_order_status_failed_id'), '', TRUE);
                 $this->model_checkout_order->addOrderHistory($orderid, $this->config->get('payment_hyperpay_valu_order_status_failed_id'), '', TRUE);
                 $this->log->write("Hyperpay: Unauthorized Transaction. Transaction Failed. $failed_msg. Order Id: $orderid");
                 $this->response->redirect($this->url->link('extension/payment/hyperpay_valu/fail', '', true));

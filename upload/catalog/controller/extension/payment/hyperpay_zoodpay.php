@@ -9,10 +9,7 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
         $this->load->model('checkout/order');
         $this->load->model('tool/image');
         $data['button_confirm'] = $this->language->get('button_confirm');
-        //--------------------------------------
 
-
-        // Amount
         $order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
         $orderAmount = $order_info['total'];
         $orderid = $this->session->data['order_id'];
@@ -22,9 +19,8 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
             $customer_mobile = substr_replace($customer_mobile, '962', 0, 1);
         }
 
-
         $channel = $this->config->get('payment_hyperpay_zoodpay_channel');
-        $token = $this->config->get('payment_hyperpay_zoodpay_accesstoken');
+        $accessToken = $this->config->get('payment_hyperpay_zoodpay_accesstoken');
         $type = $this->config->get('payment_hyperpay_zoodpay_trans_type');
         $currency = $this->config->get('payment_hyperpay_zoodpay_base_currency');
 
@@ -36,7 +32,6 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
         $country = $order_info['payment_iso_code_2'];
         $postcode = $order_info['payment_postcode'];
         $payment_address = $order_info['payment_address_1'];
-
 
         $state = $order_info['payment_zone'];
         $email = $order_info['email'];
@@ -52,7 +47,7 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
             "&merchantTransactionId=$transactionID" .
             "&currency=$currency" .
             "&paymentType=$type" .
-            "&customer.mobile=$customer_mobile". // here
+            "&customer.mobile=$customer_mobile".
             "&customer.givenName=$firstNameBilling".
             "&customer.surname=$surNameBilling".
             "&billing.postcode=$postcode" .
@@ -70,7 +65,6 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
             "&cart.items[$key].price=". number_format($this->currency->convert($product['price'], $this->config->get('config_currency'), $currency), 2, '.', '').
             "&cart.items[$key].quantity={$product['quantity']}";
             $categories[] = $product['name'];
-            
         }
 
         $datacontent .= "&customParameters[categories]=" . json_encode($categories) ;
@@ -91,40 +85,30 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
         $datacontent .= '&customParameters[bill_number]=' . $transactionID;
         $datacontent .= '&customParameters[locale]=' . $this->session->data['language'];
 
-
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            'Authorization:Bearer ' . $token
+            'Authorization:Bearer ' . $accessToken
         ));
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $datacontent);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $responseData = curl_exec($ch);
-        // print_r($responseData);
-        // die;
         if (curl_errno($ch)) {
-                    print_r($responseData);
-                    exit;
             return curl_error($ch);
         }
         curl_close($ch);
 
-
         $result = json_decode($responseData);
-        //var_dump($result);exit;
-        $token = '';
+        $checkoutId = '';
 
         if (isset($result->id)) {
-            $token = $result->id;
+            $checkoutId = $result->id;
         }
 
-        //--------------------------------------
-        $data['token'] = $token;
-        $data['scriptURL'] = $scriptURL . $token;
-
-
+        $data['token'] = $checkoutId;
+        $data['scriptURL'] = $scriptURL . $checkoutId;
 
         $data['language_code'] = $this->session->data['language'];
 
@@ -143,14 +127,15 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
         if (isset($_GET['id'])) {
             $this->load->model('checkout/order');
 
-            $token = $_GET["id"];
+            $checkoutId = preg_replace('/[^a-zA-Z0-9_\-]/', '', $_GET['id']);
+            if (empty($checkoutId)) { exit; }
 
             $testMode = $this->config->get('payment_hyperpay_zoodpay_testmode');
 
             if ($testMode == 0) {
-                $url = "https://oppwa.com/v1/checkouts/$token/payment";
+                $url = "https://oppwa.com/v1/checkouts/$checkoutId/payment";
             } else {
-                $url = "https://test.oppwa.com/v1/checkouts/$token/payment";
+                $url = "https://test.oppwa.com/v1/checkouts/$checkoutId/payment";
             }
             $url .= "?entityId=" . trim($this->config->get('payment_hyperpay_zoodpay_channel'));
             $accesstoken = $this->config->get('payment_hyperpay_zoodpay_accesstoken');
@@ -161,7 +146,7 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
             ));
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
 
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             $responseData = curl_exec($ch);
             if (curl_errno($ch)) {
@@ -174,14 +159,13 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
             $failed_msg = '';
             $orderid = '';
 
-
             switch ($resultJson->result->code) {
                 case (preg_match('/^(000\.000\.|000\.100\.1|000\.[36])/', $resultJson->result->code) ? true : false):
                 case (preg_match('/^(000\.400\.0|000\.400\.100)/', $resultJson->result->code) ? true : false):
                     $success = 1;
                     break;
                 default:
-                    if ($resultJson->paymentBrand == 'SADAD') {
+                    if (($resultJson->paymentBrand ?? '') == 'SADAD') {
                         if (isset($resultJson->resultDetails->ErrorMessage)) {
                             $failed_msg = $resultJson->resultDetails->Error;
                         } else {
@@ -193,10 +177,7 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
             }
             $orderid = $resultJson->merchantTransactionId;
 
-
-
             $order_info = $this->model_checkout_order->getOrder($orderid);
-
 
             if ($order_info) {
                 if ($success == 1) {
@@ -224,7 +205,6 @@ class ControllerExtensionPaymentHyperpayZoodPay extends Controller
                     $this->sendEmail($this->config->get('config_email'), 'Hyperpay callback failed!', $message);
                 }
 
-                //$this->model_checkout_order->confirm($orderid, $this->config->get('payment_hyperpay_zoodpay_order_status_failed_id'), '', TRUE);
                 $this->model_checkout_order->addOrderHistory($orderid, $this->config->get('payment_hyperpay_zoodpay_order_status_failed_id'), '', TRUE);
                 $this->log->write("Hyperpay: Unauthorized Transaction. Transaction Failed. $failed_msg. Order Id: $orderid");
                 $this->response->redirect($this->url->link('extension/payment/hyperpay_zoodpay/fail', '', true));
