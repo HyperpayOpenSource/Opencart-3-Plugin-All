@@ -32,8 +32,9 @@ class ControllerExtensionPaymenthyperpayclicktopay extends Controller
         $token = $this->config->get('payment_hyperpay_click_to_pay_accesstoken');
         $type = $this->config->get('payment_hyperpay_click_to_pay_trans_type');
         $connector = $this->config->get('payment_hyperpay_click_to_pay_connector');
-        $amount = number_format($orderAmount * $order_info['currency_value'] ,2, '.', '');
         $currency = $this->config->get('payment_hyperpay_click_to_pay_base_currency');
+
+        $amount = number_format($this->currency->convert($orderAmount, $this->config->get('config_currency'), $currency), 2, '.', '');
         $transactionID = $orderid;
         $firstName = $order_info['payment_firstname'];
         $family = $order_info['payment_lastname'];
@@ -141,7 +142,7 @@ class ControllerExtensionPaymenthyperpayclicktopay extends Controller
         if ($http[0] == 'https') {
             $url = HTTPS_SERVER;
         }
-        $data['postbackURL'] = $url . 'index.php?route=extension/payment/hyperpay/callback';
+        $data['postbackURL'] = $url . 'index.php?route=extension/payment/hyperpay_click_to_pay/callback';
 
         return $this->load->view('extension/payment/hyperpay_click_to_pay', $data);
     }
@@ -241,7 +242,7 @@ class ControllerExtensionPaymenthyperpayclicktopay extends Controller
                     $this->model_checkout_order->addOrderHistory($orderid, $this->config->get('payment_hyperpay_click_to_pay_order_status_failed_id'), '', TRUE);
                     $this->log->write("Hyperpay: Unauthorized Transaction. Transaction Failed. $failed_msg . Order Id: $orderid");
                     $this->session->data['payment_hyperpay_click_to_pay_error'] = $failed_msg;
-                    $this->response->redirect($this->url->link('extension/payment/hyperpay/fail', '', true));
+                    $this->response->redirect($this->url->link('extension/payment/hyperpay_click_to_pay/fail', '', true));
                 }
                 exit;
             } else {
@@ -258,7 +259,7 @@ class ControllerExtensionPaymenthyperpayclicktopay extends Controller
                 //$this->model_checkout_order->confirm($orderid, $this->config->get('payment_hyperpay_click_to_pay_order_status_failed_id'), '', TRUE);
                 $this->model_checkout_order->addOrderHistory($orderid, $this->config->get('payment_hyperpay_click_to_pay_order_status_failed_id'), '', TRUE);
                 $this->log->write("Hyperpay: Unauthorized Transaction. Transaction Failed. $failed_msg. Order Id: $orderid");
-                $this->response->redirect($this->url->link('extension/payment/hyperpay/fail', '', true));
+                $this->response->redirect($this->url->link('extension/payment/hyperpay_click_to_pay/fail', '', true));
                 exit;
             }
         }

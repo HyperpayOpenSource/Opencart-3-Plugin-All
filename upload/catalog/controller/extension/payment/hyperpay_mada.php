@@ -30,8 +30,9 @@ class ControllerExtensionPaymentHyperpayMada extends Controller
         $token = $this->config->get('payment_hyperpay_mada_accesstoken');
         $type = $this->config->get('payment_hyperpay_mada_trans_type');
         $connector = $this->config->get('payment_hyperpay_mada_connector');
-        $amount = number_format($orderAmount * $order_info['currency_value'] ,2, '.', '');
         $currency = $this->config->get('payment_hyperpay_mada_base_currency');
+
+        $amount = number_format($this->currency->convert($orderAmount, $this->config->get('config_currency'), $currency), 2, '.', '');
         $transactionID = $orderid;
         $firstName = $order_info['payment_firstname'];
         $family = $order_info['payment_lastname'];
@@ -97,7 +98,10 @@ class ControllerExtensionPaymentHyperpayMada extends Controller
 
         if ($mode == 'CONNECTOR_TEST') {
             $datacontent .= "&testMode=EXTERNAL";
+            $datacontent .= "&customParameters[3DS2_enrolled]=true";
+            $datacontent .= "&customParameters[3DS2_flow]=challenge";
         }
+        
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
