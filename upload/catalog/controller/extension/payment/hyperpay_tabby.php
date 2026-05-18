@@ -25,8 +25,9 @@ class ControllerExtensionPaymentHyperpayTabby extends Controller
         $channel = $this->config->get('payment_hyperpay_tabby_channel');
         $token = $this->config->get('payment_hyperpay_tabby_accesstoken');
         $type = $this->config->get('payment_hyperpay_tabby_trans_type');
-        $amount = number_format($orderAmount * $order_info['currency_value'] ,2, '.', '');
         $currency = $this->config->get('payment_hyperpay_tabby_base_currency');
+
+        $amount = number_format($this->currency->convert($orderAmount, $this->config->get('config_currency'), $currency), 2, '.', '');
         $transactionID = $orderid;
         $city = $order_info['payment_city'];
         $state = $order_info['payment_zone'];
@@ -53,12 +54,12 @@ class ControllerExtensionPaymentHyperpayTabby extends Controller
         
         foreach($this->cart->getProducts() as $key => $product){
            $datacontent .=
-            "&cart.items[$key].name=$product[name]". // here
-            "&cart.items[$key].sku=$product[product_id]". // here
-            "&cart.items[$key].price=". number_format(round($product['price'], 2), 2, '.', '').// here
-            "&cart.items[$key].quantity=$product[quantity]". // here
-            "&cart.items[$key].description=$product[name]". // here
-            "&cart.items[$key].productUrl=".$this->model_tool_image->resize($product['image'] , 200 , 200) ;// here
+            "&cart.items[$key].name={$product['name']}".
+            "&cart.items[$key].sku={$product['product_id']}".
+            "&cart.items[$key].price=". number_format(round($product['price'], 2), 2, '.', '').
+            "&cart.items[$key].quantity={$product['quantity']}".
+            "&cart.items[$key].description={$product['name']}".
+            "&cart.items[$key].productUrl=".$this->model_tool_image->resize($product['image'] , 200 , 200);
             
         }
 

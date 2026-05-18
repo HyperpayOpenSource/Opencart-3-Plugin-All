@@ -29,8 +29,9 @@ class ControllerExtensionPaymentHyperpayApple extends Controller
         $token = $this->config->get('payment_hyperpay_apple_accesstoken');
         $type = $this->config->get('payment_hyperpay_apple_trans_type');
         $connector = $this->config->get('payment_hyperpay_apple_connector');
-        $amount = number_format($orderAmount * $order_info['currency_value'] ,2, '.', '');
         $currency = $this->config->get('payment_hyperpay_apple_base_currency');
+
+        $amount = number_format($this->currency->convert($orderAmount, $this->config->get('config_currency'), $currency), 2, '.', '');
         $transactionID = $orderid;
         $firstName = $order_info['payment_firstname'];
         $family = $order_info['payment_lastname'];
