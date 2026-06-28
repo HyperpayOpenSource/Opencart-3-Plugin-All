@@ -12,7 +12,7 @@ class ControllerExtensionPaymentHyperpayJaywan extends Controller
         $testMode = $this->config->get('payment_hyperpay_jaywan_testmode');
         if ($testMode == 0) {
             $scriptURL = "https://oppwa.com/v1/paymentWidgets.js?checkoutId=";
-            $url = "https://oppwa.com/v1/checkouts";
+            $url = "https://eu-prod.oppwa.com/v1/checkouts";
         } else {
             $scriptURL = "https://test.oppwa.com/v1/paymentWidgets.js?checkoutId=";
             $url = "https://test.oppwa.com/v1/checkouts";
