@@ -9,7 +9,8 @@ class ModelExtensionPaymentHyperpayApple extends Model {
             'code'       => 'hyperpay_apple',
             'terms'      => '',
             'title'      => $this->config->get('payment_hyperpay_apple_heading_title'),
-            'sort_order' => $this->config->get('payment_hyperpay_apple_sort_order')
+            'sort_order' => $this->config->get('payment_hyperpay_apple_sort_order'),
+            'icon' => HTTPS_SERVER . 'image/catalog/hyperpay/APPLEPAY.svg'
         );
 
         return $method_data;        
