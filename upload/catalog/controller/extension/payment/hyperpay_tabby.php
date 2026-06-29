@@ -65,11 +65,11 @@ class ControllerExtensionPaymentHyperpayTabby extends Controller
 
         $testMode = $this->config->get('payment_hyperpay_tabby_testmode');
         if ($testMode == 0) {
-            $scriptURL = "https://oppwa.com/v1/paymentWidgets.js?checkoutId=";
-            $url = "https://oppwa.com/v1/checkouts";
+            $scriptURL = "https://eu-prod.oppwa.com/v1/paymentWidgets.js?checkoutId=";
+            $url = "https://eu-prod.oppwa.com/v1/checkouts";
         } else {
-            $scriptURL = "https://test.oppwa.com/v1/paymentWidgets.js?checkoutId=";
-            $url = "https://test.oppwa.com/v1/checkouts";
+            $scriptURL = "https://eu-test.oppwa.com/v1/paymentWidgets.js?checkoutId=";
+            $url = "https://eu-test.oppwa.com/v1/checkouts";
             $datacontent .= "&testMode=EXTERNAL";
         }
 
@@ -132,9 +132,9 @@ class ControllerExtensionPaymentHyperpayTabby extends Controller
             $testMode = $this->config->get('payment_hyperpay_tabby_testmode');
 
             if ($testMode == 0) {
-                $url = "https://oppwa.com/v1/checkouts/$token/payment";
+                $url = "https://eu-prod.oppwa.com/v1/checkouts/$token/payment";
             } else {
-                $url = "https://test.oppwa.com/v1/checkouts/$token/payment";
+                $url = "https://eu-test.oppwa.com/v1/checkouts/$token/payment";
             }
             $url .= "?entityId=" . trim($this->config->get('payment_hyperpay_tabby_channel'));
             $accesstoken = $this->config->get('payment_hyperpay_tabby_accesstoken');
