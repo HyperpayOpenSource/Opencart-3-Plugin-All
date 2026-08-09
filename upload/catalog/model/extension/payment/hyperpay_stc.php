@@ -11,7 +11,8 @@ class ModelExtensionPaymentHyperpayStc extends Model
             'code'       => 'hyperpay_stc',
             'terms'      => '',
             'title'      => $this->config->get('payment_hyperpay_stc_heading_title'),
-            'sort_order' => $this->config->get('payment_hyperpay_stc_sort_order')
+            'sort_order' => $this->config->get('payment_hyperpay_stc_sort_order'),
+            'icon' => HTTPS_SERVER . 'image/catalog/hyperpay/STC_PAY.svg'
         );
 
         return $method_data;

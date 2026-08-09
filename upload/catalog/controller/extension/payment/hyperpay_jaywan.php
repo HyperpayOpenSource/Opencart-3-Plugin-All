@@ -1,15 +1,15 @@
 <?php
 
-class ControllerExtensionPaymentHyperpayApple extends Controller
+class ControllerExtensionPaymentHyperpayJaywan extends Controller
 {
 
     public function index()
     {
-        $this->language->load('extension/payment/hyperpay');
+        $this->language->load('extension/payment/hyperpay_jaywan');
         $this->load->model('checkout/order');
         $data['button_confirm'] = $this->language->get('button_confirm');
         //--------------------------------------
-        $testMode = $this->config->get('payment_hyperpay_apple_testmode');
+        $testMode = $this->config->get('payment_hyperpay_jaywan_testmode');
         if ($testMode == 0) {
             $scriptURL = "https://eu-prod.oppwa.com/v1/paymentWidgets.js?checkoutId=";
             $url = "https://eu-prod.oppwa.com/v1/checkouts";
@@ -22,14 +22,15 @@ class ControllerExtensionPaymentHyperpayApple extends Controller
         $order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
         $orderAmount = $order_info['total'];
         $orderid = $this->session->data['order_id'];
+        $customer_id = $order_info['customer_id'];
 
 
-        $channel = $this->config->get('payment_hyperpay_apple_channel');
-        $mode = $this->config->get('payment_hyperpay_apple_trans_mode');
-        $token = $this->config->get('payment_hyperpay_apple_accesstoken');
-        $type = $this->config->get('payment_hyperpay_apple_trans_type');
-        $connector = $this->config->get('payment_hyperpay_apple_connector');
-        $currency = $this->config->get('payment_hyperpay_apple_base_currency');
+        $channel = $this->config->get('payment_hyperpay_jaywan_channel');
+        $mode = $this->config->get('payment_hyperpay_jaywan_trans_mode');
+        $token = $this->config->get('payment_hyperpay_jaywan_accesstoken');
+        $type = $this->config->get('payment_hyperpay_jaywan_trans_type');
+        $connector = $this->config->get('payment_hyperpay_jaywan_connector');
+        $currency = $this->config->get('payment_hyperpay_jaywan_base_currency');
 
         $amount = number_format($this->currency->convert($orderAmount, $this->config->get('config_currency'), $currency), 2, '.', '');
         $transactionID = $orderid;
@@ -53,6 +54,14 @@ class ControllerExtensionPaymentHyperpayApple extends Controller
             "&paymentType=$type" .
             "&merchantTransactionId=$transactionID" .
             "&customer.email=$email";
+
+        $datacontent .= '&customParameters[branch_id]=1';
+        $datacontent .= '&customParameters[teller_id]=1';
+        $datacontent .= '&customParameters[device_id]=1';
+        $datacontent .= '&customParameters[bill_number]=' . $transactionID;
+        $datacontent .= '&customParameters[locale]=' . $this->session->data['language'];
+
+
 
         $firstNameBilling = preg_replace('/\s/', '', str_replace("&", "", $firstName));
         $surNameBilling = preg_replace('/\s/', '', str_replace("&", "", $family));
@@ -107,14 +116,13 @@ class ControllerExtensionPaymentHyperpayApple extends Controller
             $token = $result->id;
         }
 
-        $payment_brands = implode(' ', $this->config->get('payment_hyperpay_apple_brands'));
+        $payment_brands = implode(' ', $this->config->get('payment_hyperpay_jaywan_brands'));
         //--------------------------------------
         $data['token'] = $token;
         $data['payment_brands'] = $payment_brands;
-        $data['supportedNetworks'] = json_encode($this->config->get('payment_hyperpay_apple_supported_networks'));
         $data['scriptURL'] = $scriptURL . $token;
 
-        $data['formStyle'] = $this->config->get('payment_hyperpay_apple_payment_style');
+        $data['formStyle'] = $this->config->get('payment_hyperpay_jaywan_payment_style');
         $data['language_code'] = $this->session->data['language'];
 
         $http = explode(':', $this->url->link('checkout/success'));
@@ -122,9 +130,9 @@ class ControllerExtensionPaymentHyperpayApple extends Controller
         if ($http[0] == 'https') {
             $url = HTTPS_SERVER;
         }
-        $data['postbackURL'] = $url . 'index.php?route=extension/payment/hyperpay_apple/callback';
+        $data['postbackURL'] = $url . 'index.php?route=extension/payment/hyperpay_jaywan/callback';
 
-        return $this->load->view('extension/payment/hyperpay_apple', $data);
+        return $this->load->view('extension/payment/hyperpay_jaywan', $data);
     }
 
     public function callback()
@@ -134,15 +142,15 @@ class ControllerExtensionPaymentHyperpayApple extends Controller
 
             $token = $_GET["id"];
 
-            $testMode = $this->config->get('payment_hyperpay_apple_testmode');
+            $testMode = $this->config->get('payment_hyperpay_jaywan_testmode');
 
             if ($testMode == 0) {
                 $url = "https://eu-prod.oppwa.com/v1/checkouts/$token/payment";
             } else {
                 $url = "https://eu-test.oppwa.com/v1/checkouts/$token/payment";
             }
-            $url .= "?entityId=" . trim($this->config->get('payment_hyperpay_apple_channel'));
-            $accesstoken = $this->config->get('payment_hyperpay_apple_accesstoken');
+            $url .= "?entityId=" . trim($this->config->get('payment_hyperpay_jaywan_channel'));
+            $accesstoken = $this->config->get('payment_hyperpay_jaywan_accesstoken');
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_HTTPHEADER, array(
@@ -182,38 +190,39 @@ class ControllerExtensionPaymentHyperpayApple extends Controller
             $orderid = $resultJson->merchantTransactionId;
 
 
+
             $order_info = $this->model_checkout_order->getOrder($orderid);
+
 
             if ($order_info) {
                 if ($success == 1) {
                     // Order is accepted.
                     $transUniqueID = $resultJson->id;
-                    $this->model_checkout_order->addOrderHistory($orderid, $this->config->get('payment_hyperpay_apple_order_status_id'), "Trans Unique ID:$transUniqueID\n", TRUE);
+                    $this->model_checkout_order->addOrderHistory($orderid, $this->config->get('payment_hyperpay_jaywan_order_status_id'), "Trans Unique ID:$transUniqueID\n", TRUE);
                     $this->success();
                 } else {
                     // Order is not approved.
-                    $this->model_checkout_order->addOrderHistory($orderid, $this->config->get('payment_hyperpay_apple_order_status_failed_id'), '', TRUE);
-                    $this->log->write("hyperpay_apple: Unauthorized Transaction. Transaction Failed. $failed_msg . Order Id: $orderid");
-                    $this->session->data['payment_hyperpay_apple_error'] = $failed_msg;
-                    $this->response->redirect($this->url->link('extension/payment/hyperpay_apple/fail', '', true));
+                    $this->model_checkout_order->addOrderHistory($orderid, $this->config->get('payment_hyperpay_jaywan_order_status_failed_id'), '', TRUE);
+                    $this->log->write("Hyperpay: Unauthorized Transaction. Transaction Failed. $failed_msg . Order Id: $orderid");
+                    $this->session->data['payment_hyperpay_jaywan_error'] = $failed_msg;
+                    $this->response->redirect($this->url->link('extension/payment/hyperpay_jaywan/fail', '', true));
                 }
                 exit;
             } else {
-                if ($this->config->get('payment_hyperpay_apple_mailerrors') == 1) {
+                if ($this->config->get('payment_hyperpay_jaywan_mailerrors') == 1) {
                     $message = "Hello,\n\nThis is your OpenCart site at " . $this->url->link('common/home') . ".\n\n";
-                    $message .= "I've received this callback from hyperpay_apple, and I couldn't approve it.\n\n";
-                    $message .= "This is the failed message that were sent from hyperpay_apple: $failed_msg.\n\n";
+                    $message .= "I've received this callback from Hyperpay, and I couldn't approve it.\n\n";
+                    $message .= "This is the failed message that were sent from Hyperpay: $failed_msg.\n\n";
 
-                    $message .= "\nYou can disable these notifications by changing the \"Enable error logging by email?\" setting within the hyperpay_apple merchant setup.";
+                    $message .= "\nYou can disable these notifications by changing the \"Enable error logging by email?\" setting within the Hyperpay merchant setup.";
 
-                    $this->sendEmail($this->config->get('config_email'), 'hyperpay_apple callback failed!', $message);
+                    $this->sendEmail($this->config->get('config_email'), 'Hyperpay callback failed!', $message);
                 }
 
-                //$this->model_checkout_order->confirm($orderid, $this->config->get('payment_hyperpay_apple_order_status_failed_id'), '', TRUE);
-                $this->model_checkout_order->addOrderHistory($orderid, $this->config->get('payment_hyperpay_apple_order_status_failed_id'), '', TRUE);
-                $this->log->write("hyperpay_apple: Unauthorized Transaction. Transaction Failed. $failed_msg. Order Id: $orderid");
-                $this->response->redirect($this->url->link('extension/payment/hyperpay_apple/fail', '', true));
-                print 'fff';
+                //$this->model_checkout_order->confirm($orderid, $this->config->get('payment_hyperpay_jaywan_order_status_failed_id'), '', TRUE);
+                $this->model_checkout_order->addOrderHistory($orderid, $this->config->get('payment_hyperpay_jaywan_order_status_failed_id'), '', TRUE);
+                $this->log->write("Hyperpay: Unauthorized Transaction. Transaction Failed. $failed_msg. Order Id: $orderid");
+                $this->response->redirect($this->url->link('extension/payment/hyperpay_jaywan/fail', '', true));
                 exit;
             }
         }
@@ -256,11 +265,11 @@ class ControllerExtensionPaymentHyperpayApple extends Controller
 
     public function fail()
     {
-        $this->language->load('extension/payment/hyperpay');
-        $data['heading_title'] = $this->config->get('payment_hyperpay_apple_heading_title');
+        $this->language->load('extension/payment/hyperpay_jaywan');
+        $data['heading_title'] = $this->config->get('payment_hyperpay_jaywan_heading_title');
 
-        if (isset($this->session->data['payment_hyperpay_apple_error'])) {
-            $data['general_error'] = $this->session->data['payment_hyperpay_apple_error'];
+        if (isset($this->session->data['payment_hyperpay_jaywan_error'])) {
+            $data['general_error'] = $this->session->data['payment_hyperpay_jaywan_error'];
         } else {
             $data['general_error'] = $this->language->get('general_error');;
         }

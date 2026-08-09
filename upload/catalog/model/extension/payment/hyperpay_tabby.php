@@ -11,7 +11,8 @@ class ModelExtensionPaymentHyperpayTabby extends Model
             'code'       => 'hyperpay_tabby',
             'terms'      => '',
             'title'      => $this->config->get('payment_hyperpay_tabby_heading_title'),
-            'sort_order' => $this->config->get('payment_hyperpay_tabby_sort_order')
+            'sort_order' => $this->config->get('payment_hyperpay_tabby_sort_order'),
+            'icon' => HTTPS_SERVER . 'image/catalog/hyperpay/TABBY.svg'
         );
 
         return $method_data;

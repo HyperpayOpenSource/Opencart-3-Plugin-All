@@ -11,7 +11,8 @@ class ModelExtensionPaymentHyperpayZoodPay extends Model
             'code'       => 'hyperpay_zoodpay',
             'terms'      => '',
             'title'      => $this->config->get('payment_hyperpay_zoodpay_heading_title'),
-            'sort_order' => $this->config->get('payment_hyperpay_zoodpay_sort_order')
+            'sort_order' => $this->config->get('payment_hyperpay_zoodpay_sort_order'),
+            'icon' => HTTPS_SERVER . 'image/catalog/hyperpay/image/catalog/hyperpay/Hyperpay.png'
         );
 
         return $method_data;

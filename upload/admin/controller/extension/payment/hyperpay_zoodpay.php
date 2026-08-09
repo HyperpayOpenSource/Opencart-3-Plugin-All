@@ -1,4 +1,3 @@
-
 <?php
 
 class ControllerExtensionPaymentHyperpayZoodPay extends Controller
