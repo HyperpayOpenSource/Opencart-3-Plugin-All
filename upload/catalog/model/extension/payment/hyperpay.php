@@ -9,7 +9,8 @@ class ModelExtensionPaymentHyperpay extends Model {
             'code'       => 'hyperpay',
             'terms'      => '',
             'title'      => $this->config->get('payment_hyperpay_heading_title'),
-            'sort_order' => $this->config->get('payment_hyperpay_sort_order')
+            'sort_order' => $this->config->get('payment_hyperpay_sort_order'),
+            'icon' => HTTPS_SERVER . 'image/catalog/hyperpay/Hyperpay.png'
         );
 
         return $method_data;        

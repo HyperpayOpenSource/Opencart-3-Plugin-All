@@ -11,7 +11,8 @@ class ModelExtensionPaymentHyperpayClickToPay extends Model
             'code'       => 'hyperpay_click_to_pay',
             'terms'      => '',
             'title'      => $this->config->get('payment_hyperpay_click_to_pay_heading_title'),
-            'sort_order' => $this->config->get('payment_hyperpay_click_to_pay_sort_order')
+            'sort_order' => $this->config->get('payment_hyperpay_click_to_pay_sort_order'),
+            'icon' => HTTPS_SERVER . 'image/catalog/hyperpay/click-to-pay.png'
         );
 
         return $method_data;
