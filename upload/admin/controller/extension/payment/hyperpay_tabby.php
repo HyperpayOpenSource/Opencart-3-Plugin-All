@@ -108,6 +108,7 @@ class ControllerExtensionPaymentHyperpayTabby extends Controller
 
         $data['entry_order_status'] = $this->language->get('entry_order_status');
         $data['entry_order_status_failed'] = $this->language->get('entry_order_status_failed');
+        $data['entry_order_status_pending'] = $this->language->get('entry_order_status_pending');
 
         //-----------------------------------------------------------------------
 
@@ -196,6 +197,14 @@ class ControllerExtensionPaymentHyperpayTabby extends Controller
             $data['payment_hyperpay_tabby_order_status_failed_id'] = $this->request->post['payment_hyperpay_tabby_order_status_failed_id'];
         } else {
             $data['payment_hyperpay_tabby_order_status_failed_id'] = $this->config->get('payment_hyperpay_tabby_order_status_failed_id');
+        }
+
+        if (isset($this->request->post['payment_hyperpay_tabby_order_status_pending_id'])) {
+            $data['payment_hyperpay_tabby_order_status_pending_id'] = $this->request->post['payment_hyperpay_tabby_order_status_pending_id'];
+        } elseif ($this->config->get('payment_hyperpay_tabby_order_status_pending_id')) {
+            $data['payment_hyperpay_tabby_order_status_pending_id'] = $this->config->get('payment_hyperpay_tabby_order_status_pending_id');
+        } else {
+            $data['payment_hyperpay_tabby_order_status_pending_id'] = 1;
         }
 
 
