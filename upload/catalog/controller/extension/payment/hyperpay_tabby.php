@@ -6,215 +6,153 @@ class ControllerExtensionPaymentHyperpayTabby extends Controller
     public function index()
     {
         $this->language->load('extension/payment/hyperpay_tabby');
-        $this->load->model('checkout/order');
-        $this->load->model('tool/image');
+
         $data['button_confirm'] = $this->language->get('button_confirm');
-        //--------------------------------------
-
-
-        // Amount
-        $order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
-        $orderAmount = $order_info['total'];
-        $orderid = $this->session->data['order_id'];
-
-        $shipping_cost = number_format(round($this->session->data['shipping_method']['cost'] ?? 0, 2), 2, '.', '');
-        $tax_amount = number_format(round(array_sum($this->cart->getTaxes()), 2), 2, '.', '');
-        $customer_mobile = $order_info['telephone'];
-
-
-        $channel = $this->config->get('payment_hyperpay_tabby_channel');
-        $token = $this->config->get('payment_hyperpay_tabby_accesstoken');
-        $type = $this->config->get('payment_hyperpay_tabby_trans_type');
-        $currency = $this->config->get('payment_hyperpay_tabby_base_currency');
-
-        $amount = number_format($this->currency->convert($orderAmount, $this->config->get('config_currency'), $currency), 2, '.', '');
-        $transactionID = $orderid;
-        $city = $order_info['payment_city'];
-        $state = $order_info['payment_zone'];
-        $email = $order_info['email'];
-        $firstNameBilling = preg_replace('/\s/', '', str_replace("&", "", $order_info['payment_firstname']));
-        $surNameBilling = preg_replace('/\s/', '', str_replace("&", "", $order_info['payment_lastname']));
-
-        if (empty($state)) {
-            $state = $city;
-        }
-
-       
-        $datacontent = "entityId=$channel" .
-            "&amount=$amount" .
-            "&currency=$currency" .
-            "&paymentType=$type" .
-            "&taxAmount=$tax_amount". // here
-            "&shipping.cost=$shipping_cost". // here
-            "&customer.mobile=$customer_mobile". // here
-            "&customer.givenName=$firstNameBilling".
-            "&customer.surname=$surNameBilling".
-            "&merchantTransactionId=$transactionID" .
-            "&customer.email=$email";
-        
-        foreach($this->cart->getProducts() as $key => $product){
-           $datacontent .=
-            "&cart.items[$key].name={$product['name']}".
-            "&cart.items[$key].sku={$product['product_id']}".
-            "&cart.items[$key].price=". number_format(round($product['price'], 2), 2, '.', '').
-            "&cart.items[$key].quantity={$product['quantity']}".
-            "&cart.items[$key].description={$product['name']}".
-            "&cart.items[$key].productUrl=".$this->model_tool_image->resize($product['image'] , 200 , 200);
-            
-        }
-
-        $testMode = $this->config->get('payment_hyperpay_tabby_testmode');
-        if ($testMode == 0) {
-            $scriptURL = "https://eu-prod.oppwa.com/v1/paymentWidgets.js?checkoutId=";
-            $url = "https://eu-prod.oppwa.com/v1/checkouts";
-        } else {
-            $scriptURL = "https://eu-test.oppwa.com/v1/paymentWidgets.js?checkoutId=";
-            $url = "https://eu-test.oppwa.com/v1/checkouts";
-            $datacontent .= "&testMode=EXTERNAL";
-        }
-
-        $datacontent .= '&customParameters[branch_id]=1';
-        $datacontent .= '&customParameters[teller_id]=1';
-        $datacontent .= '&customParameters[device_id]=1';
-        $datacontent .= '&customParameters[bill_number]=' . $transactionID;
-        $datacontent .= '&customParameters[locale]=' . $this->session->data['language'];
-
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            'Authorization:Bearer ' . $token
-        ));
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $datacontent);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $responseData = curl_exec($ch);
-        if (curl_errno($ch)) {
-            return curl_error($ch);
-        }
-        curl_close($ch);
-
-
-        $result = json_decode($responseData);
-        //var_dump($result);exit;
-        $token = '';
-
-        if (isset($result->id)) {
-            $token = $result->id;
-        }
-
-        //--------------------------------------
-        $data['token'] = $token;
-        $data['scriptURL'] = $scriptURL . $token;
-
-
-
-        $data['language_code'] = $this->session->data['language'];
-
-        $http = explode(':', $this->url->link('checkout/success'));
-        $url = HTTP_SERVER;
-        if ($http[0] == 'https') {
-            $url = HTTPS_SERVER;
-        }
-        $data['postbackURL'] = $url . 'index.php?route=extension/payment/hyperpay_tabby/callback';
+        $data['text_loading'] = $this->language->get('text_loading');
+        $data['confirm_url'] = str_replace('&amp;', '&', $this->url->link('extension/payment/hyperpay_tabby/confirm', '', true));
 
         return $this->load->view('extension/payment/hyperpay_tabby', $data);
     }
 
-    public function callback()
+    public function confirm()
     {
-        if (isset($_GET['id'])) {
-            $this->load->model('checkout/order');
+        $this->load->language('extension/payment/hyperpay');
 
-            $token = $_GET["id"];
+        $json = array();
 
-            $testMode = $this->config->get('payment_hyperpay_tabby_testmode');
+        $this->load->model('checkout/order');
 
-            if ($testMode == 0) {
-                $url = "https://eu-prod.oppwa.com/v1/checkouts/$token/payment";
+        $order_id = isset($this->session->data['order_id']) ? (int)$this->session->data['order_id'] : 0;
+        $order_info = $order_id ? $this->model_checkout_order->getOrder($order_id) : array();
+
+        if (!$order_info || !isset($this->session->data['payment_method']['code']) || $this->session->data['payment_method']['code'] != 'hyperpay_tabby') {
+            $json['error'] = $this->language->get('general_error');
+        } else {
+            $this->load->model('extension/payment/hyperpay_s2s');
+            $this->load->model('extension/payment/hyperpay_tabby');
+
+            $currency = $this->config->get('payment_hyperpay_tabby_base_currency');
+            $default_currency = $this->config->get('config_currency');
+            $converter = $this->currency;
+
+            $convert = function ($value) use ($converter, $default_currency, $currency) {
+                return $converter->convert($value, $default_currency, $currency);
+            };
+
+            $test = (bool)$this->config->get('payment_hyperpay_tabby_testmode');
+
+            $cfg = array(
+                'channel'    => $this->config->get('payment_hyperpay_tabby_channel'),
+                'trans_type' => $this->config->get('payment_hyperpay_tabby_trans_type'),
+                'test'       => $test,
+            );
+
+            $return_url = str_replace('&amp;', '&', $this->url->link('extension/payment/hyperpay_tabby/callback', 'order_id=' . $order_id, true));
+
+            $charged = $convert($order_info['total']);
+
+            $params = array_merge(
+                $this->model_extension_payment_hyperpay_s2s->baseParams($cfg, $order_id, $charged, $currency, 'TABBY', $return_url),
+                $this->model_extension_payment_hyperpay_tabby->buildParams($this->model_extension_payment_hyperpay_tabby->gatherContext($order_id), $convert)
+            );
+
+            $url = $this->model_extension_payment_hyperpay_s2s->baseUrl($test) . '/v1/payments';
+            $response = $this->model_extension_payment_hyperpay_s2s->post($url, $this->config->get('payment_hyperpay_tabby_accesstoken'), $params);
+
+            $code = isset($response['result']['code']) ? $response['result']['code'] : '';
+
+            if ($this->model_extension_payment_hyperpay_s2s->isPending($code) && !empty($response['redirect']['url'])) {
+                $json['action'] = $response['redirect']['url'];
+                $json['method'] = !empty($response['redirect']['method']) ? $response['redirect']['method'] : 'POST';
+                $json['fields'] = $this->model_extension_payment_hyperpay_s2s->redirectFields($response['redirect']);
             } else {
-                $url = "https://eu-test.oppwa.com/v1/checkouts/$token/payment";
-            }
-            $url .= "?entityId=" . trim($this->config->get('payment_hyperpay_tabby_channel'));
-            $accesstoken = $this->config->get('payment_hyperpay_tabby_accesstoken');
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                'Authorization:Bearer ' . $accesstoken
-            ));
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            $responseData = curl_exec($ch);
-            if (curl_errno($ch)) {
-                return curl_error($ch);
-            }
-            curl_close($ch);
-            $resultJson = json_decode($responseData);
-
-            $success = 0;
-            $failed_msg = '';
-            $orderid = '';
-
-            switch ($resultJson->result->code) {
-                case (preg_match('/^(000\.000\.|000\.100\.1|000\.[36])/', $resultJson->result->code) ? true : false):
-                case (preg_match('/^(000\.400\.0|000\.400\.100)/', $resultJson->result->code) ? true : false):
-                    $success = 1;
-                    break;
-                default:
-                    if ($resultJson->paymentBrand == 'SADAD') {
-                        if (isset($resultJson->resultDetails->ErrorMessage)) {
-                            $failed_msg = $resultJson->resultDetails->Error;
-                        } else {
-                            $failed_msg = $resultJson->result->description;
-                        }
-                    } else {
-                        $failed_msg = $resultJson->result->description;
-                    }
-            }
-            $orderid = $resultJson->merchantTransactionId;
-
-
-
-            $order_info = $this->model_checkout_order->getOrder($orderid);
-
-
-            if ($order_info) {
-                if ($success == 1) {
-                    // Order is accepted.
-                    $transUniqueID = $resultJson->id;
-                    $this->model_checkout_order->addOrderHistory($orderid, $this->config->get('payment_hyperpay_tabby_order_status_id'), "Trans Unique ID:$transUniqueID\n", TRUE);
-                    $this->success();
-                } else {
-                    // Order is not approved.
-                    $this->model_checkout_order->addOrderHistory($orderid, $this->config->get('payment_hyperpay_tabby_order_status_failed_id'), '', TRUE);
-                    $this->log->write("Hyperpay: Unauthorized Transaction. Transaction Failed. $failed_msg . Order Id: $orderid");
-                    $this->session->data['payment_hyperpay_tabby_error'] = $failed_msg;
-                    $this->response->redirect($this->url->link('extension/payment/hyperpay_tabby/fail', '', true));
-                }
-                exit;
-            } else {
-                if ($this->config->get('payment_hyperpay_tabby_mailerrors') == 1) {
-                    $message = "Hello,\n\nThis is your OpenCart site at " . $this->url->link('common/home') . ".\n\n";
-                    $message .= "I've received this callback from Hyperpay, and I couldn't approve it.\n\n";
-                    $message .= "This is the failed message that were sent from Hyperpay: $failed_msg.\n\n";
-
-                    $message .= "\nYou can disable these notifications by changing the \"Enable error logging by email?\" setting within the Hyperpay merchant setup.";
-
-                    $this->sendEmail($this->config->get('config_email'), 'Hyperpay callback failed!', $message);
-                }
-
-                //$this->model_checkout_order->confirm($orderid, $this->config->get('payment_hyperpay_tabby_order_status_failed_id'), '', TRUE);
-                $this->model_checkout_order->addOrderHistory($orderid, $this->config->get('payment_hyperpay_tabby_order_status_failed_id'), '', TRUE);
-                $this->log->write("Hyperpay: Unauthorized Transaction. Transaction Failed. $failed_msg. Order Id: $orderid");
-                $this->response->redirect($this->url->link('extension/payment/hyperpay_tabby/fail', '', true));
-                exit;
+                $failed_msg = $this->model_extension_payment_hyperpay_s2s->errorMessage($response);
+                $this->log->write("Hyperpay Tabby: payment request rejected. Code: $code. $failed_msg Order Id: $order_id");
+                $json['error'] = $failed_msg !== '' ? $failed_msg : $this->language->get('general_error');
             }
         }
 
-        exit;
+        $this->response->addHeader('Content-Type: application/json');
+        $this->response->setOutput(json_encode($json));
+    }
+
+    public function callback()
+    {
+        $this->load->model('checkout/order');
+        $this->load->model('extension/payment/hyperpay_s2s');
+
+        $order_id = isset($this->request->get['order_id']) ? (int)$this->request->get['order_id'] : 0;
+        $resource_path = $this->resourcePath();
+
+        if (!$order_id || $resource_path === '') {
+            $this->log->write("Hyperpay Tabby: callback without a valid payment reference. Order Id: $order_id");
+            $this->response->redirect($this->url->link('extension/payment/hyperpay_tabby/fail', '', true));
+        }
+
+        $test = (bool)$this->config->get('payment_hyperpay_tabby_testmode');
+        $url = $this->model_extension_payment_hyperpay_s2s->baseUrl($test) . $resource_path . '?entityId=' . urlencode(trim($this->config->get('payment_hyperpay_tabby_channel')));
+        $resultJson = $this->model_extension_payment_hyperpay_s2s->get($url, $this->config->get('payment_hyperpay_tabby_accesstoken'));
+
+        $code = isset($resultJson['result']['code']) ? $resultJson['result']['code'] : '';
+        $transUniqueID = isset($resultJson['id']) ? $resultJson['id'] : '';
+        $merchant_transaction_id = isset($resultJson['merchantTransactionId']) ? (string)$resultJson['merchantTransactionId'] : '';
+        $parts = explode('I', $merchant_transaction_id);
+        $failed_msg = $this->model_extension_payment_hyperpay_s2s->errorMessage($resultJson);
+
+        $order_info = ((int)$parts[0] === $order_id) ? $this->model_checkout_order->getOrder($order_id) : array();
+
+        if ($order_info) {
+            $success_status_id = $this->config->get('payment_hyperpay_tabby_order_status_id');
+
+            if ($this->model_extension_payment_hyperpay_s2s->isSuccess($code)) {
+                if ($order_info['order_status_id'] != $success_status_id) {
+                    $this->model_checkout_order->addOrderHistory($order_id, $success_status_id, "Trans Unique ID:$transUniqueID\n", TRUE);
+                }
+                $this->success();
+            } elseif ($this->model_extension_payment_hyperpay_s2s->isPending($code)) {
+                $pending_status_id = $this->config->get('payment_hyperpay_tabby_order_status_pending_id') ?: 1;
+
+                if ($order_info['order_status_id'] != $success_status_id) {
+                    $this->model_checkout_order->addOrderHistory($order_id, $pending_status_id, "Awaiting gateway confirmation. Payment ID: $transUniqueID", TRUE);
+                }
+                $this->success();
+            } else {
+                if ($order_info['order_status_id'] != $success_status_id) {
+                    $this->model_checkout_order->addOrderHistory($order_id, $this->config->get('payment_hyperpay_tabby_order_status_failed_id'), '', TRUE);
+                }
+                $this->log->write("Hyperpay: Unauthorized Transaction. Transaction Failed. Code: $code. $failed_msg . Order Id: $order_id");
+                $this->session->data['payment_hyperpay_tabby_error'] = $failed_msg;
+                $this->response->redirect($this->url->link('extension/payment/hyperpay_tabby/fail', '', true));
+            }
+        } else {
+            if ($this->config->get('payment_hyperpay_tabby_mailerrors') == 1) {
+                $message = "Hello,\n\nThis is your OpenCart site at " . $this->url->link('common/home') . ".\n\n";
+                $message .= "I've received this callback from Hyperpay, and I couldn't approve it.\n\n";
+                $message .= "This is the failed message that were sent from Hyperpay: $failed_msg.\n\n";
+
+                $message .= "\nYou can disable these notifications by changing the \"Enable error logging by email?\" setting within the Hyperpay merchant setup.";
+
+                $this->sendEmail($this->config->get('config_email'), 'Hyperpay callback failed!', $message);
+            }
+
+            $this->log->write("Hyperpay: Unauthorized Transaction. Transaction Failed. Code: $code. $failed_msg. Order Id: $order_id, merchantTransactionId: $merchant_transaction_id");
+            $this->response->redirect($this->url->link('extension/payment/hyperpay_tabby/fail', '', true));
+        }
+    }
+
+    private function resourcePath()
+    {
+        $source = isset($this->request->get['resourcePath']) || isset($this->request->get['id']) ? $this->request->get : $this->request->post;
+
+        if (isset($source['resourcePath']) && preg_match('#^/v1/payments/[\w.-]+$#', $source['resourcePath'])) {
+            return $source['resourcePath'];
+        }
+
+        if (isset($source['id']) && preg_match('#^[\w.-]+$#', $source['id'])) {
+            return '/v1/payments/' . $source['id'];
+        }
+
+        return '';
     }
 
     public function sendEmail($toEmail, $subject, $message)

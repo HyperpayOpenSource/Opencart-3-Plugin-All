@@ -1,57 +1,44 @@
-<style>
-form {
-    display:block;
-}
-</style>
+<div id="hyperpay-tabby-alert"></div>
+<div class="buttons">
+  <div class="pull-right">
+    <input type="button" value="{{ button_confirm }}" id="button-confirm" data-loading-text="{{ text_loading }}" class="btn btn-primary" />
+  </div>
+</div>
+<script type="text/javascript"><!--
+$('#button-confirm').on('click', function() {
+	$.ajax({
+		url: '{{ confirm_url }}',
+		type: 'post',
+		dataType: 'json',
+		cache: false,
+		beforeSend: function() {
+			$('#hyperpay-tabby-alert').empty();
+			$('#button-confirm').button('loading');
+		},
+		success: function(json) {
+			if (json['action']) {
+				var form = $('<form></form>').attr('action', json['action']).attr('method', json['method']).css('display', 'none');
 
-<script>
-    var wpwlOptions = {
-    style: "plain",
-	paymentTarget: "_top",
-     browser: {
-           threeDChallengeWindow: 5
-       },
-	locale: "{{ language_code }}",
-	onReady: function(){
+				$.each(json['fields'] || [], function(index, field) {
+					form.append($('<input type="hidden" />').attr('name', field['name']).val(field['value']));
+				});
 
-    $('.wpwl-form-virtualAccount-tabby .wpwl-wrapper-radio-qrcode').hide();
-    $('.wpwl-form-virtualAccount-tabby .wpwl-wrapper-radio-mobile').hide();
-    $('.wpwl-form-virtualAccount-tabby .wpwl-group-paymentMode').hide();
-    $('.wpwl-form-virtualAccount-tabby .wpwl-group-mobilePhone').show();
-    $('.wpwl-form-virtualAccount-tabby .wpwl-wrapper-radio-mobile .wpwl-control-radio-mobile').attr('checked',true);
-    $('.wpwl-form-virtualAccount-tabby .wpwl-wrapper-radio-mobile .wpwl-control-radio-mobile').trigger('click');
+				$('body').append(form);
+				form.submit();
 
-    },
+				return;
+			}
 
-    };
+			var notice = $('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> <span></span> <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
 
-
-</script>
-{% if language_code == 'ar' %}
-<style>
-.wpwl-group{
-	direction:ltr !important;
-}
-.wpwl-control-cardNumber{
-direction:ltr !important;
-text-align:right;
-}
-</style>
-{% endif %}
-
-<script>
-$.ajaxSetup({
-    // Disable caching of AJAX responses
-    cache: true
+			notice.find('span').text(json['error'] || '');
+			$('#hyperpay-tabby-alert').append(notice);
+			$('#button-confirm').button('reset');
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			$('#button-confirm').button('reset');
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
 });
-</script>
-
-<script src="{{ scriptURL }}"></script>
-
-<div>
-    <form action="{{ postbackURL }}" class="paymentWidgets"  data-brands="TABBY">
-    </form>
-</div>
-<div class="buttons" style="display:none;">
-  <div class="right"><a id="button-confirm" class="button" onclick="$('#payment').submit();"><span>{{ button_confirm }}</span></a></div>
-</div>
+//--></script>
